@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2015-2016 Strength In Numbers Foundation
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -1440,8 +1441,9 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     }
                 }
 
-// dvd this is a hack to test concept
-// test to make sure that there will be a balance post TX and if so send 10% of it back to wallet
+// dvd test to make sure that there will be a balance post TX and if so send 10% of it back to wallet
+// dvd this collects 10% more coins than required to help fold smaller TX back into larger outputs
+
                 nCharityRet = (nBalance - nValue - nFeeRet) * 0.01;
                 if (nCharityRet < 0)
                     nCharityRet = 0;
