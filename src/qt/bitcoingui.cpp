@@ -101,17 +101,17 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
                 "QComboBox:editable  { background: white; }" \
                 "QComboBox:!editable, QComboBox::drop-down:editable { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E1E1E1, stop: 0.4 #DDDDDD, stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3); } " \
                 "QComboBox:!editable:on, QComboBox::drop-down:editable:on  { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D3D3D3, stop: 0.4 #D8D8D8, stop: 0.5 #DDDDDD, stop: 1.0 #E1E1E1); } " \
-                "QComboBox:on  { /* shift the text when the popup opens */ padding-top: 3px; padding-left: 4px; } " \
-                "QComboBox::drop-down  { subcontrol-origin: padding; subcontrol-position: top right; width: 15px; border-left-width: 1px; border-left-color: darkgray; border-left-style: solid; /* just a single line */ border-top-right-radius: 3px; /* same radius as the QComboBox */ border-bottom-right-radius: 3px; } " \
+                "QComboBox:on  {  padding-top: 3px; padding-left: 4px; } " \
+                "QComboBox::drop-down  { subcontrol-origin: padding; subcontrol-position: top right; width: 15px; border-left-width: 1px; border-left-color: darkgray; border-left-style: solid;  border-top-right-radius: 3px;  border-bottom-right-radius: 3px; } " \
                 "QComboBox::down-arrow1  { image: url(:/icons/1downarrow.png); } " \
-                "QComboBox::down-arrow:on  { /* shift the arrow when popup is open */ top: 1px; left: 1px; }" \
+                "QComboBox::down-arrow:on  { top: 1px; left: 1px; }" \
                 "QLineEdit { border: 1px solid #cccccc; border-radius: 4px; padding: 0px 4px; background: white; selection-background-color: #333333; color: 333333; margin: 6px; }" \
                 "QLabel { color: #404041; font-family:Open Sans; } " \
                 "QTableView { selection-background-color: #00ccff; background-color: #c7c8ca; border-color: #e8e8e8; margin: 6px; } " \
                 "QTableView1 QHeaderView { } " \
                 "QTableView1 QAbstractItemView { margin: 4px; min-height: 28px; border: 3px; } " \
                 "QStatusBar { background: #a7aaac; } " \
-                    "#frame { } QToolBar QLabel { padding-top:15px;padding-bottom:10px;margin:0px; border: 0px; border-color: yellow;} " \
+                "#frame { } QToolBar QLabel { padding-top:15px;padding-bottom:10px;margin:0px; border: 0px; border-color: yellow;} " \
                 "#frameBlocks { border: 0px transparent; } " \
                 "#frameTop { background-color: #ffffff; border: 2px solid #cccccc; border-top-width: 0px; border-left-width: 0px; border-right-width: 0px; } " \
                 "#labelBalance, #labelStake, #labelUnconfirmed, #labelImmature { color: #333333 ; } " \
@@ -121,30 +121,28 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
                 "#listTransactions { background-color: #ffffff; border: 2px solid #cccccc; border-top-width: 0px; border-left-width: 0px; border-right-width: 0px; } " \
                 "#listTransactions::item { background-color: #ffffff; } " \
                 "#frame2 { background-color: #ffffff; } " \
-                    "#spacer { background:#a7aaac;border:none; } " \
-                "QToolBar#toolbar2 { background-color: #00ccff; width: 72px; min-height: 80px; max-height: 80px; border: 0px; margin: -4px; padding: -4px; } " \
-                "QToolBar#toolbar2 > QToolButton { background-color: #00ccff; height: 100%; width: 72px; icon-size: 72px; } " \
+                "#spacer { background:#a7aaac;border:none; } " \
+                "QToolBar#toolbar2 { background-color: #1d1d1d; width: 72px; min-height: 80px; max-height: 80px; border: none; margin: -4px; padding: -4px; } " \
+                "QToolBar#toolbar2 > QToolButton { background-color: #00ccff; height: 100%; width: 72px;  } " \
                 "QToolBar#toolbar2 > QToolButton:disabled { background-color: #00ccff; height: 100%; } " \
                 "QToolBar#toolbar { min-height: 80px; max-height: 80px; padding1-top:0px; background: #1d1d1d; max-width:1200px; border: none; margin: -4px; padding: -4px; } " \
-                "QToolBar#toolbar > QToolButton { color: #00ccff; border: none; font-size:10px; height: 100%; font-family:Open Sans;padding-top:10px; width:72px; background-color: #1d1d1d } " \
-                "QToolBar#toolbar > QToolButton:hover:!checked { color: #00ccff; background-color: #ffffff; border: none; } " \
+                "QToolBar#toolbar > QToolButton { color: #ffffff; border: none; font-size:10px; height: 100%; font-family:Open Sans;padding-top:10px; width:72px; background-color: #1d1d1d } " \
+                "QToolBar#toolbar > QToolButton:hover:!checked { color: #ffffff; background-color: #00ccff; border: none; } " \
                 "QToolBar#toolbar > QToolButton:pressed { color: #00ccff; background-color: #333333; border: none; } " \
                 "QToolBar#toolbar > QToolButton:checked { color: #00ccff; background-color: #333333; border: none; } " \
-                "QToolBar#toolbar > QToolButton:disabled { color: grey font-family:Open Sans; } " \
-                    "#labelMiningIcon { padding-left:5px;font-family:Open Sans;width:100%;font-size:10px;text-align:center;color:grey; } " \
+                "QToolBar#toolbar > QToolButton:disabled { color: grey; font-family:Open Sans; } " \
+                "#labelMiningIcon { padding-left:5px;font-family:Open Sans;width:100%;font-size:10px;text-align:center;color:grey; } " \
                 "QToolButton { min-height: 22px; background-color: #333333; color: white; border: 1px solid #cccccc; } " \
                 "QMenu { background: #a7aaac; color: #404041; padding-bottom:10px; border: 1px solid grey; } " \
                 "QMenu::item { color:#404041; background-color: transparent; } " \
                 "QMenu::item:selected { color: #282828; background-color: #e8e8e8; } " \
                 "QMenuBar { background: #a7aaac; color: #404041; } " \
                 "QMenuBar::item { font-size:12px;padding-bottom:12px;padding-top:12px;padding-left:15px;padding-right:15px;color:#282828; background-color: transparent; } " \
-                "QMenuBar::item:selected { color: #e8e8e8; background-color: #282828); }"
+                "QMenuBar::item:selected { color: #e8e8e8; background-color: #282828; }" \
                 "QTabWidget {background-color: #e8e8e8; }" \
                 "#debug QLabel {color: white; }" \
                 "QDateTime {}"
     );
-
-
 
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/bitcoin"));
@@ -233,7 +231,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     timerMintingWeights->start(30 * 1000);
     connect(timerMintingWeights, SIGNAL(timeout()), this, SLOT(updateMintingWeights()));
     // Set initial values for user and network weights
-    nWeight, nNetworkWeight = 0;
+    nWeight = nNetworkWeight = 0;
 
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
@@ -289,7 +287,7 @@ void BitcoinGUI::createActions()
 {
     QActionGroup *tabGroup = new QActionGroup(this);
 
-    overviewAction = new QAction(QIcon(":/icons/cwc-icon-overview"), tr("&Overview"), this);
+    overviewAction = new QAction(QIcon(":/icons/Dashboard"), tr("&Dashboard"), this);
     overviewAction->setToolTip(tr("Show general overview of wallet"));
     overviewAction->setCheckable(true);
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
@@ -297,25 +295,25 @@ void BitcoinGUI::createActions()
 
     tabGroup->addAction(overviewAction);
 
-    sendCoinsAction = new QAction(QIcon(":/icons/cwc-icon-send-big"), tr("&Give"), this);
+    sendCoinsAction = new QAction(QIcon(":/icons/Give"), tr("&Give"), this);
     sendCoinsAction->setToolTip(tr("Send coins to a 2GiveCoin address"));
     sendCoinsAction->setCheckable(true);
     sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
     tabGroup->addAction(sendCoinsAction);
 
-    receiveCoinsAction = new QAction(QIcon(":/icons/cwc-icon-get-big"), tr("&Receive"), this);
+    receiveCoinsAction = new QAction(QIcon(":/icons/Receive"), tr("&Receive"), this);
     receiveCoinsAction->setToolTip(tr("Show the list of addresses for receiving payments"));
     receiveCoinsAction->setCheckable(true);
     receiveCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
     tabGroup->addAction(receiveCoinsAction);
 
-    historyAction = new QAction(QIcon(":/icons/cwc-icon-transactions"), tr("&Transactions"), this);
+    historyAction = new QAction(QIcon(":/icons/Transactions"), tr("&Transactions"), this);
     historyAction->setToolTip(tr("Browse transaction history"));
     historyAction->setCheckable(true);
     historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
     tabGroup->addAction(historyAction);
 
-    addressBookAction = new QAction(QIcon(":/icons/cwc-icon-addresses"), tr("&Addresses"), this);
+    addressBookAction = new QAction(QIcon(":/icons/Contacts"), tr("&Contacts"), this);
     addressBookAction->setToolTip(tr("Edit the list of stored addresses and labels"));
     addressBookAction->setCheckable(true);
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
@@ -357,14 +355,14 @@ void BitcoinGUI::createActions()
     signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &message..."), this);
     verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify message..."), this);
 
-    giftCoinsAction = new QAction(QIcon(":/icons/cwc-icon-qrcode-big"), tr("&Gift"), this);
+    giftCoinsAction = new QAction(QIcon(":/icons/QRCODE32"), tr("&Gift"), this);
     giftCoinsAction->setToolTip(tr("Gift coins for Social Tipping"));
 
-    charitySendAction = new QAction(QIcon(":/icons/cwc-icon-give-big"), tr("&Donate"), this);
+    charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Donate"), this);
     charitySendAction->setToolTip(tr("Donate coins for Charity purposes"));
 
 
-    exportAction = new QAction(QIcon(":/icons/export"), tr("&Export..."), this);
+    exportAction = new QAction(QIcon(":/icons/Export"), tr("&Export..."), this);
     exportAction->setToolTip(tr("Export the data in the current tab to a file"));
     openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Advanced Options"), this);
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
@@ -432,12 +430,12 @@ void BitcoinGUI::createMenuBar()
 
 void BitcoinGUI::createToolBars()
 {
-    QToolBar *toolbar2 = addToolBar(tr("2GiveCoin Icon"));
+    QToolBar *toolbar2 = addToolBar(tr("2GIVE"));
     toolbar2->setObjectName("toolbar2");
     toolbar2->setFloatable(false);
     toolbar2->setMovable(false);
     toolbar2->setIconSize(QSize(100,85));
-    QAction *cwcicon = new QAction(QIcon(":/icons/cwc-icon"), tr("2give.info"),toolbar2);
+    QAction *cwcicon = new QAction(QIcon(":/icons/2Give-Heart"), tr("2Give.Info"),toolbar2);
 
     cwcicon->setObjectName("cwcicon");
     cwcicon->setDisabled(false);
@@ -617,6 +615,8 @@ void BitcoinGUI::setNumConnections(int count)
 
 void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
 {
+    printf("BitcoinGUI::setNumBlocks(%d, %d)\n", count, nTotalBlocks);
+
     // don't show / hide progress bar and its label if we have no connection to the network
     if (!clientModel || clientModel->getNumConnections() == 0)
     {
@@ -692,7 +692,8 @@ void BitcoinGUI::setNumBlocks(int count, int nTotalBlocks)
     }
 
     // Set icon state: spinning if catching up, tick otherwise
-    if(secs < 90*60 && count >= nTotalBlocks)
+//dvd    if(secs < 90*60 && count >= nTotalBlocks)
+    if (count >= nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));

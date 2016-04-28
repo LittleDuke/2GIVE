@@ -26,7 +26,7 @@
         <file alias="toolbar_testnet">res/icons/givecoin-16.png</file>
         <file alias="edit">res/icons/edit.png</file>
         <file alias="history">res/icons/history.png</file>
-        <file alias="overview">res/icons/overview.png</file>
+        <file alias="overview-old">res/icons/overview.png</file>
         <file alias="export">res/icons/export.png</file>
         <file alias="synced">res/icons/synced.png</file>
         <file alias="remove">res/icons/remove.png</file>
@@ -54,11 +54,25 @@
         <file alias="cwc-icon-transactions">res/icons/cwc-icon-transactions.png</file>
         <file alias="cwc-icon-qrcode-big">res/icons/cwc-icon-qrcode-big.png</file>
         <file alias="icon-qrcode-big">res/icons/coin-icon-qrcode-big64.png</file>
+        <file alias="Give">res/icons/2Give-Give32.png</file>
+        <file alias="Dashboard">res/icons/2Give-Dashboard32.png</file>
+        <file alias="Receive">res/icons/2Give-Receive32.png</file>
+        <file alias="Transactions">res/icons/2Give-Transactions32.png</file>
+        <file alias="Contacts">res/icons/2Give-Contacts32.png</file>
+        <file alias="Donate">res/icons/2Give-Donate32.png</file>
+        <file alias="Export">res/icons/2Give-Export32.png</file>
+        <file alias="Rewards20">res/icons/2Give-Rewards20.png</file>
+        <file alias="Rewards16">res/icons/2Give-Rewards16.png</file>
+        <file alias="Interest16">res/icons/2Give-Interest16.png</file>
+        <file alias="Give20">res/icons/2Give-Give20.png</file>
+        <file alias="Donate20">res/icons/2Give-Donate20.png</file>
+        <file alias="Receive20">res/icons/2Give-Receive20.png</file>
+        <file alias="2Give-Heart">res/icons/2Give-Heart.png</file>
+        <file alias="QRCODE32">res/icons/2Give-QRCODE.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
         <file alias="splash">res/images/splash.png</file>
-        <file alias="banner">res/images/banner.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>
