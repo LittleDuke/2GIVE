@@ -69,6 +69,7 @@
         <file alias="Receive20">res/icons/2Give-Receive20.png</file>
         <file alias="2Give-Heart">res/icons/2Give-Heart.png</file>
         <file alias="QRCODE32">res/icons/2Give-QRCODE.png</file>
+        <file alias="Gift">res/icons/2Give-Gift32.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

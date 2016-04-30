@@ -122,14 +122,14 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
                 "#listTransactions::item { background-color: #ffffff; } " \
                 "#frame2 { background-color: #ffffff; } " \
                 "#spacer { background:#a7aaac;border:none; } " \
-                "QToolBar#toolbar2 { background-color: #1d1d1d; width: 72px; min-height: 80px; max-height: 80px; border: none; margin: -4px; padding: -4px; } " \
-                "QToolBar#toolbar2 > QToolButton { background-color: #00ccff; height: 100%; width: 72px;  } " \
+                "QToolBar#toolbar2 { background-color: #00ccff; width: 72px; min-height: 80px; max-height: 80px; border: 0px; margin: -4px; padding: -4px; } " \
+                "QToolBar#toolbar2 > QToolButton { background-color: #00ccff; height: 100%; width: 72px; icon-size: 72px; } " \
                 "QToolBar#toolbar2 > QToolButton:disabled { background-color: #00ccff; height: 100%; } " \
                 "QToolBar#toolbar { min-height: 80px; max-height: 80px; padding1-top:0px; background: #1d1d1d; max-width:1200px; border: none; margin: -4px; padding: -4px; } " \
-                "QToolBar#toolbar > QToolButton { color: #ffffff; border: none; font-size:10px; height: 100%; font-family:Open Sans;padding-top:10px; width:72px; background-color: #1d1d1d } " \
+                "QToolBar#toolbar > QToolButton { color: #00ccff; border: none; font-size:10px; height: 100%; font-family:Open Sans;padding-top:10px; width:72px; background-color: #1d1d1d } " \
                 "QToolBar#toolbar > QToolButton:hover:!checked { color: #ffffff; background-color: #00ccff; border: none; } " \
-                "QToolBar#toolbar > QToolButton:pressed { color: #00ccff; background-color: #333333; border: none; } " \
-                "QToolBar#toolbar > QToolButton:checked { color: #00ccff; background-color: #333333; border: none; } " \
+                "QToolBar#toolbar > QToolButton:pressed { color: #ffffff; background-color: #00ccff; border: none; } " \
+                "QToolBar#toolbar > QToolButton:checked { color: #ffffff; background-color: #00ccff; border: none; } " \
                 "QToolBar#toolbar > QToolButton:disabled { color: grey; font-family:Open Sans; } " \
                 "#labelMiningIcon { padding-left:5px;font-family:Open Sans;width:100%;font-size:10px;text-align:center;color:grey; } " \
                 "QToolButton { min-height: 22px; background-color: #333333; color: white; border: 1px solid #cccccc; } " \
@@ -355,7 +355,7 @@ void BitcoinGUI::createActions()
     signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &message..."), this);
     verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify message..."), this);
 
-    giftCoinsAction = new QAction(QIcon(":/icons/QRCODE32"), tr("&Gift"), this);
+    giftCoinsAction = new QAction(QIcon(":/icons/Gift"), tr("&Gift"), this);
     giftCoinsAction->setToolTip(tr("Gift coins for Social Tipping"));
 
     charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Donate"), this);

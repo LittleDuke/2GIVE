@@ -60,8 +60,13 @@ win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
-contains(USE_QRCODE, 1) {
+contains(USE_QRCODE, -) {
+    message(Building with without QRCode support)
+} else {
     message(Building with QRCode support)
+    count(USE_QRCODE, 0) {
+        USE_QRCODE=1
+    }
     DEFINES += USE_QRCODE
     LIBS += -lqrencode
 }
