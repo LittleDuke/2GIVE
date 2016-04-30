@@ -1,9 +1,11 @@
+#ifndef Q_MOC_RUN
 #include "rpcconsole.h"
 #include "ui_rpcconsole.h"
 
 #include "clientmodel.h"
 #include "bitcoinrpc.h"
 #include "guiutil.h"
+#endif
 
 #include <QTime>
 #include <QTimer>

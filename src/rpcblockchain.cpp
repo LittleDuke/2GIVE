@@ -122,7 +122,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
 Value getblockcount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /* dvd        throw runtime_error(
             "getblockcount\n"
             "Returns the number of blocks in the longest block chain.");
@@ -134,7 +134,7 @@ Value getblockcount(const Array& params, bool fHelp)
 Value getdifficulty(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd
         throw runtime_error(
             "getdifficulty\n"
@@ -151,7 +151,7 @@ Value getdifficulty(const Array& params, bool fHelp)
 Value settxfee(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 1 || AmountFromZeroValue(params[0]) < MIN_TX_FEE)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "settxfee <amount>\n"
             "<amount> is a real and is rounded to the nearest 0.01");
@@ -165,7 +165,7 @@ Value settxfee(const Array& params, bool fHelp)
 Value getrawmempool(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getrawmempool\n"
             "Returns all transaction ids in memory pool.");
@@ -183,14 +183,14 @@ Value getrawmempool(const Array& params, bool fHelp)
 Value getblockhash(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd       throw runtime_error(
             "getblockhash <index>\n"
             "Returns hash of block in best-block-chain at <index>.");
 */
     int nHeight = params[0].get_int();
     if (nHeight < 0 || nHeight > nBestHeight)
-        return NULL;
+        return Value();
 //dvd        throw runtime_error("Block number out of range.");
 
     CBlockIndex* pblockindex = FindBlockByHeight(nHeight);
@@ -200,7 +200,7 @@ Value getblockhash(const Array& params, bool fHelp)
 Value getblock(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getblock <hash> [txinfo]\n"
             "txinfo optional to print more detailed tx info\n"
@@ -222,7 +222,7 @@ Value getblock(const Array& params, bool fHelp)
 Value getblockbynumber(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getblock <number> [txinfo]\n"
             "txinfo optional to print more detailed tx info\n"
@@ -230,7 +230,7 @@ Value getblockbynumber(const Array& params, bool fHelp)
 */
     int nHeight = params[0].get_int();
     if (nHeight < 0 || nHeight > nBestHeight)
-        return NULL;
+        return Value();
 //dvd        throw runtime_error("Block number out of range.");
 
     CBlock block;
@@ -250,7 +250,7 @@ Value getblockbynumber(const Array& params, bool fHelp)
 Value getcheckpoint(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getcheckpoint\n"
             "Show info of synchronized checkpoint.\n");
