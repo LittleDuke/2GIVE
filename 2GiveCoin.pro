@@ -133,6 +133,8 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
 QMAKE_CXXFLAGS += -msse2
 QMAKE_CFLAGS += -msse2
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+# This may be necessary for other platforms besides the Mac:
+macx:QMAKE_CXXFLAGS_WARN_ON += -Wno-reserved-user-defined-literal
 
 # Input
 DEPENDPATH += src src/json src/qt
@@ -401,26 +403,23 @@ macx:ICON = src/qt/res/icons/givecoin.icns
 macx:TARGET = "2GiveCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 
+macx:QMAKE_LFLAGS_THREAD += -pthread
+macx:QMAKE_CXXFLAGS_THREAD += -pthread
+
 # Since Mavericks, -stdlib=libc++ is the default, and bottled homebrew
 # libraries will expect it. I am not clear what effect this will have
 # on actual deployment.
 
-# Original, won't work with modern homebrew:
-# macx:QMAKE_LFLAGS_THREAD += -pthread
-# macx:QMAKE_CXXFLAGS_THREAD += -pthread
-
 # Working:
 #
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
-macx:QMAKE_LFLAGS_THREAD += -pthread
-macx:QMAKE_CXXFLAGS_THREAD += -pthread
+#QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
 
 # Works on 10.11. Not clear whether it would actually work on
 # 10.7. Shouldn't work on 10.6.
 #
-# QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
-# macx:QMAKE_LFLAGS_THREAD += -pthread -stdlib=libc++
-# macx:QMAKE_CXXFLAGS_THREAD += -pthread -stdlib=libc++
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+macx:QMAKE_LFLAGS += -stdlib=libc++
+macx:QMAKE_CXXFLAGS += -stdlib=libc++
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
