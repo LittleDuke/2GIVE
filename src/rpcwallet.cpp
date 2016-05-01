@@ -64,7 +64,7 @@ string AccountFromValue(const Value& value)
 Value getinfo(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getinfo\n"
             "Returns an object containing various state info.");
@@ -99,7 +99,7 @@ Value getinfo(const Array& params, bool fHelp)
 Value getnewpubkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "getnewpubkey [account]\n"
             "Returns new public key for coinbase generation.");
@@ -128,7 +128,7 @@ Value getnewpubkey(const Array& params, bool fHelp)
 Value getnewaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getnewaddress [account]\n"
             "Returns a new 2GiveCoin address for receiving payments.  "
@@ -198,7 +198,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
 Value getaccountaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getaccountaddress <account>\n"
             "Returns the current 2GiveCoin address for receiving payments to this account.");
@@ -218,7 +218,7 @@ Value getaccountaddress(const Array& params, bool fHelp)
 Value setaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "setaccount <2GiveCoinaddress> <account>\n"
             "Sets the account associated with the given address.");
@@ -249,7 +249,7 @@ Value setaccount(const Array& params, bool fHelp)
 Value getaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getaccount <2GiveCoinaddress>\n"
             "Returns the account associated with the given address.");
@@ -269,7 +269,7 @@ Value getaccount(const Array& params, bool fHelp)
 Value getaddressesbyaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getaddressesbyaccount <account>\n"
             "Returns the list of addresses for the given account.");
@@ -291,7 +291,7 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
 Value setdefaultaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
         "setdefaultaddress <2GiveCoinaddress>\n"
             "sets the default receiving address in the wallet"
@@ -332,7 +332,7 @@ Value setdefaultaddress(const Array& params, bool fHelp)
 Value sendtoaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
         "sendtoaddress <2GiveCoinaddress> <amount> [comment] [comment-to]\n"
             "<amount> is a real and is rounded to the nearest 0.000001"
@@ -368,7 +368,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
 Value listaddressgroupings(const Array& params, bool fHelp)
 {
     if (fHelp)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listaddressgroupings\n"
             "Lists groups of addresses which have had their common ownership\n"
@@ -400,7 +400,7 @@ Value listaddressgroupings(const Array& params, bool fHelp)
 Value signmessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "signmessage <2GiveCoinaddress> <message>\n"
             "Sign a message with the private key of an address");
@@ -436,7 +436,7 @@ Value signmessage(const Array& params, bool fHelp)
 Value verifymessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "verifymessage <2GiveCoinaddress> <signature> <message>\n"
             "Verify a signed message");
@@ -474,7 +474,7 @@ Value verifymessage(const Array& params, bool fHelp)
 Value getreceivedbyaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "getreceivedbyaddress <2GiveCoinaddress> [minconf=1]\n"
             "Returns the total amount received by <2GiveCoinaddress> in transactions with at least [minconf] confirmations.");
@@ -525,7 +525,7 @@ void GetAccountAddresses(string strAccount, set<CTxDestination>& setAddress)
 Value getreceivedbyaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getreceivedbyaccount <account> [minconf=1]\n"
             "Returns the total amount received by addresses with <account> in transactions with at least [minconf] confirmations.");
@@ -601,7 +601,7 @@ int64 GetAccountBalance(const string& strAccount, int nMinDepth)
 Value getbalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getbalance [account] [minconf=1]\n"
             "If [account] is not specified, returns the server's total available balance.\n"
@@ -661,7 +661,7 @@ Value getbalance(const Array& params, bool fHelp)
 Value movecmd(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 5)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "move <fromaccount> <toaccount> <amount> [minconf=1] [comment]\n"
             "Move from one account in your wallet to another.");
@@ -716,7 +716,7 @@ Value movecmd(const Array& params, bool fHelp)
 Value sendfrom(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 6)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
         "sendfrom <fromaccount> <to2GiveCoinaddress> <amount> [minconf=1] [comment] [comment-to]\n"
             "<amount> is a real and is rounded to the nearest 0.000001"
@@ -761,7 +761,7 @@ Value sendfrom(const Array& params, bool fHelp)
 Value sendmany(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
 		"sendmany <fromaccount> {address:amount,...} [minconf=1] [comment]\n"
             "amounts are double-precision floating point numbers"
@@ -833,7 +833,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
     {
-        return NULL; // dvd
+        return Value(); // dvd
         string msg = "addmultisigaddress <nrequired> <'[\"key\",\"key\"]'> [account]\n"
             "Add a nrequired-to-sign multisignature address to the wallet\"\n"
             "each key is a 2GiveCoin address or hex-encoded public key\n"
@@ -1004,7 +1004,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
 Value listreceivedbyaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listreceivedbyaddress [minconf=1] [includeempty=false]\n"
             "[minconf] is the minimum number of confirmations before payments are included.\n"
@@ -1021,7 +1021,7 @@ Value listreceivedbyaddress(const Array& params, bool fHelp)
 Value listreceivedbyaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listreceivedbyaccount [minconf=1] [includeempty=false]\n"
             "[minconf] is the minimum number of confirmations before payments are included.\n"
@@ -1135,7 +1135,7 @@ void AcentryToJSON(const CAccountingEntry& acentry, const string& strAccount, Ar
 Value listtransactions(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 3)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listtransactions [account] [count=10] [from=0]\n"
             "Returns up to [count] most recent transactions skipping the first [from] transactions for account [account].");
@@ -1194,7 +1194,7 @@ Value listtransactions(const Array& params, bool fHelp)
 Value listaccounts(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listaccounts [minconf=1]\n"
             "Returns Object that has account names as keys, account balances as values.");
@@ -1257,7 +1257,7 @@ Value listaccounts(const Array& params, bool fHelp)
 Value listsinceblock(const Array& params, bool fHelp)
 {
     if (fHelp)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "listsinceblock [blockhash] [target-confirmations]\n"
             "Get all transactions in blocks since block [blockhash], or all transactions if omitted");
@@ -1321,7 +1321,7 @@ Value listsinceblock(const Array& params, bool fHelp)
 Value gettransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "gettransaction <txid>\n"
             "Get detailed information about <txid>");
@@ -1391,7 +1391,7 @@ Value gettransaction(const Array& params, bool fHelp)
 Value backupwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "backupwallet <destination>\n"
             "Safely copies wallet.dat to destination, which can be a directory or a path with filename.");
@@ -1407,7 +1407,7 @@ Value backupwallet(const Array& params, bool fHelp)
 Value keypoolrefill(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "keypoolrefill\n"
             "Fills the keypool."
@@ -1479,7 +1479,7 @@ void Thread2GiveCoinWalletPassphrase(void* parg)
 Value walletpassphrase(const Array& params, bool fHelp)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() < 2 || params.size() > 3))
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "walletpassphrase <passphrase> <timeout> [mintonly]\n"
             "Stores the wallet decryption key in memory for <timeout> seconds.\n"
@@ -1505,7 +1505,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
             throw JSONRPCError(RPC_WALLET_PASSPHRASE_INCORRECT, "Error: The wallet passphrase entered was incorrect.");
     }
     else
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "walletpassphrase <passphrase> <timeout>\n"
             "Stores the wallet decryption key in memory for <timeout> seconds.");
@@ -1527,7 +1527,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
 Value walletpassphrasechange(const Array& params, bool fHelp)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() != 2))
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "walletpassphrasechange <oldpassphrase> <newpassphrase>\n"
             "Changes the wallet passphrase from <oldpassphrase> to <newpassphrase>.");
@@ -1548,7 +1548,7 @@ Value walletpassphrasechange(const Array& params, bool fHelp)
     strNewWalletPass = params[1].get_str().c_str();
 
     if (strOldWalletPass.length() < 1 || strNewWalletPass.length() < 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "walletpassphrasechange <oldpassphrase> <newpassphrase>\n"
             "Changes the wallet passphrase from <oldpassphrase> to <newpassphrase>.");
@@ -1563,7 +1563,7 @@ Value walletpassphrasechange(const Array& params, bool fHelp)
 Value walletlock(const Array& params, bool fHelp)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() != 0))
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "walletlock\n"
             "Removes the wallet encryption key from memory, locking the wallet.\n"
@@ -1588,7 +1588,7 @@ Value walletlock(const Array& params, bool fHelp)
 Value encryptwallet(const Array& params, bool fHelp)
 {
     if (!pwalletMain->IsCrypted() && (fHelp || params.size() != 1))
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "encryptwallet <passphrase>\n"
             "Encrypts the wallet with <passphrase>.");
@@ -1605,7 +1605,7 @@ Value encryptwallet(const Array& params, bool fHelp)
     strWalletPass = params[0].get_str().c_str();
 
     if (strWalletPass.length() < 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "encryptwallet <passphrase>\n"
             "Encrypts the wallet with <passphrase>.");
@@ -1658,7 +1658,7 @@ public:
 Value validateaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "validateaddress <2GiveCoinaddress>\n"
             "Return information about <2GiveCoinaddress>.");
@@ -1688,7 +1688,7 @@ Value validateaddress(const Array& params, bool fHelp)
 Value validatepubkey(const Array& params, bool fHelp)
 {
     if (fHelp || !params.size() || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "validatepubkey <2GiveCoinpubkey>\n"
             "Return information about <2GiveCoinpubkey>.");
@@ -1727,7 +1727,7 @@ Value validatepubkey(const Array& params, bool fHelp)
 Value reservebalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "reservebalance [<reserve> [amount]]\n"
             "<reserve> is true or false to turn balance reserve on or off.\n"
@@ -1741,7 +1741,7 @@ Value reservebalance(const Array& params, bool fHelp)
         if (fReserve)
         {
             if (params.size() == 1)
-                return NULL;
+                return Value();
 //dvd                throw runtime_error("must provide amount to reserve balance.\n");
             int64 nAmount = AmountFromValue(params[1]);
             nAmount = (nAmount / CENT) * CENT;  // round to cent
@@ -1771,7 +1771,7 @@ Value reservebalance(const Array& params, bool fHelp)
 Value checkwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "checkwallet\n"
             "Check wallet for integrity.\n");
@@ -1795,7 +1795,7 @@ Value checkwallet(const Array& params, bool fHelp)
 Value repairwallet(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "repairwallet\n"
             "Repair wallet if checkwallet reports any problem.\n");
@@ -1818,7 +1818,7 @@ Value repairwallet(const Array& params, bool fHelp)
 Value resendtx(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "resendtx\n"
             "Re-send unconfirmed transactions.\n"
@@ -1833,7 +1833,7 @@ Value resendtx(const Array& params, bool fHelp)
 Value makekeypair(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "makekeypair [prefix]\n"
             "Make a public/private key pair.\n"
