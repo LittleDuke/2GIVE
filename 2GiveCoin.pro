@@ -20,6 +20,8 @@ BDB_INCLUDE_PATH=/usr/local/opt/berkeley-db4/include
 BDB_LIB_PATH=/usr/local/opt/berkeley-db4/lib
 OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
 OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
+QRENCODE_INCLUDE_PATH=/usr/local/opt/qrencode/include
+QRENCODE_LIB_PATH=/usr/local/opt/qrencode/lib
 
 CONFIG += static
 
@@ -40,6 +42,8 @@ UI_DIR = build
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
     # Mac: compile for maximum compatibility (10.5, 32-bit)
+    # This may be broken for Qt5. 10.7 is the last version with CI. For 10.6, "support is limited."
+    # See http://doc.qt.io/qt-5/osx.html
     macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch i386 -isysroot /Developer/SDKs/MacOSX10.5.sdk
 
     !windows:!macx {
@@ -129,6 +133,8 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
 QMAKE_CXXFLAGS += -msse2
 QMAKE_CFLAGS += -msse2
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+# This may be necessary for other platforms besides the Mac:
+macx:QMAKE_CXXFLAGS_WARN_ON += -Wno-reserved-user-defined-literal
 
 # Input
 DEPENDPATH += src src/json src/qt
@@ -396,8 +402,24 @@ macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
 macx:ICON = src/qt/res/icons/givecoin.icns
 macx:TARGET = "2GiveCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
+
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
+
+# Since Mavericks, -stdlib=libc++ is the default, and bottled homebrew
+# libraries will expect it. I am not clear what effect this will have
+# on actual deployment.
+
+# Working:
+#
+#QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+
+# Works on 10.11. Not clear whether it would actually work on
+# 10.7. Shouldn't work on 10.6.
+#
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+macx:QMAKE_LFLAGS += -stdlib=libc++
+macx:QMAKE_CXXFLAGS += -stdlib=libc++
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
