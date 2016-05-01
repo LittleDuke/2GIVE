@@ -23,7 +23,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -33,7 +33,7 @@
        <item>
         <widget class="QLabel" name="transactionFeeInfoLabel">
          <property name="text">
-          <string>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.01 recommended.</string>
+          <string>There is a mandatory 1% transaction fee to pay the nodes securing the network.  Anything else is considered generous.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -48,7 +48,7 @@
          <item>
           <widget class="QLabel" name="transactionFeeLabel">
            <property name="text">
-            <string>Pay transaction &amp;fee</string>
+            <string>Additional &amp;fee</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
