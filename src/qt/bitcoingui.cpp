@@ -130,7 +130,9 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
                 "QToolBar#toolbar > QToolButton:hover:!checked { color: #ffffff; background-color: #00ccff; border: none; } " \
                 "QToolBar#toolbar > QToolButton:pressed { color: #ffffff; background-color: #00ccff; border: none; } " \
                 "QToolBar#toolbar > QToolButton:checked { color: #ffffff; background-color: #00ccff; border: none; } " \
+#ifdef WIN32
                 "QToolBar#toolbar > QToolButton:disabled { color: grey font-family:Open Sans; } " \
+#endif
                 "#labelMiningIcon { padding-left:5px;font-family:Open Sans;width:100%;font-size:10px;text-align:center;color:grey; } " \
                 "QToolButton { min-height: 22px; background-color: #333333; color: white; border: 1px solid #cccccc; } " \
                 "QMenu { background: #a7aaac; color: #404041; padding-bottom:10px; border: 1px solid grey; } " \
