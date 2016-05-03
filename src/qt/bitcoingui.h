@@ -85,6 +85,7 @@ private:
     QProgressBar *progressBar;
 
     QMenuBar *appMenuBar;
+    QAction *giveInfoAction;
     QAction *overviewAction;
     QAction *historyAction;
     QAction *quitAction;
@@ -152,6 +153,9 @@ public slots:
     void handleURI(QString strURI);
 
 private slots:
+    /** Launch Desktop Browser */
+    void gotoGiveInfo();
+
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */

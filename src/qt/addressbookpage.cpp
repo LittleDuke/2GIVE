@@ -134,7 +134,7 @@ void AddressBookPage::setModel(AddressTableModel *model)
     // Set column widths
 #if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->resizeSection(
-            AddressTableModel::Address, 320);
+            AddressTableModel::Address, 333);
     ui->tableView->horizontalHeader()->setResizeMode(
             AddressTableModel::Label, QHeaderView::Stretch);
 #else

@@ -53,6 +53,7 @@
 #include <QMovie>
 #include <QFileDialog>
 #include <QPicture>
+#include <QDesktopServices>     // dvd add for launching URL
 
 #if QT_VERSION < 0x050000
 #include <QDesktopServices>
@@ -319,6 +320,7 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -435,13 +437,17 @@ void BitcoinGUI::createToolBars()
     toolbar2->setFloatable(false);
     toolbar2->setMovable(false);
     toolbar2->setIconSize(QSize(100,85));
-    QAction *cwcicon = new QAction(QIcon(":/icons/2Give-Heart"), tr("2Give.Info"),toolbar2);
+//    QAction *giveInfoAction = new QAction(QIcon(":/icons/2Give-Heart"), tr("2Give.Info"),toolbar2);
+    giveInfoAction = new QAction(QIcon(":/icons/2Give-Heart"), tr("2Give.Info"),toolbar2);
 
-    cwcicon->setObjectName("cwcicon");
-    cwcicon->setDisabled(false);
+    giveInfoAction->setObjectName("giveInfo");
+    giveInfoAction->setDisabled(false);
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // toolbar2->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    toolbar2->addAction(cwcicon);
+    toolbar2->addAction(giveInfoAction);
+
+    connect(giveInfoAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(giveInfoAction, SIGNAL(triggered()), this, SLOT(gotoGiveInfo()));
 
     QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
     toolbar->setObjectName("toolbar");
@@ -771,9 +777,9 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
 void BitcoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
 {
     QString strMessage =
-        tr("This transaction is over the size limit.  You can still send it for a fee of %1, "
-        "which goes to the nodes that process your transaction and helps to support the network.  "
-        "Do you want to pay the fee?").arg(
+        tr("A one percent (1%) transaction fee (TXFEE) of <br><b>%1</b> is required.  This TXFEE goes directly to the nodes "
+           "that process your transaction(s) and helps to support the network.  "
+        "<br> <br>Do you want to continue?").arg(
         BitcoinUnits::formatWithUnit(BitcoinUnits::BTC, nFeeRequired));
     QMessageBox::StandardButton retval = QMessageBox::question(
         this, tr("Confirm transaction fee"), strMessage,
@@ -814,6 +820,11 @@ void BitcoinGUI::incomingTransaction(const QModelIndex & parent, int start, int 
             .arg(type)
             .arg(address), icon);
     }
+}
+
+void BitcoinGUI::gotoGiveInfo()
+{
+    QDesktopServices::openUrl(QUrl("https://2Give.Info"));
 }
 
 void BitcoinGUI::gotoOverviewPage()
