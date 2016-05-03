@@ -16,7 +16,7 @@ using namespace std;
 Value getgenerate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw std::runtime_error(
             "getgenerate\n"
             "Returns true or false.");
@@ -29,7 +29,7 @@ Value getgenerate(const Array& params, bool fHelp)
 Value setgenerate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "setgenerate <generate> [genproclimit]\n"
             "<generate> is true or false to turn generation on or off.\n"
@@ -56,7 +56,7 @@ Value setgenerate(const Array& params, bool fHelp)
 Value getmint(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw std::runtime_error(
             "getmint\n"
             "Returns true or false.");
@@ -67,7 +67,7 @@ Value getmint(const Array& params, bool fHelp)
 Value setmint(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "setmint <stake>\n"
             "<stake> is true or false to turn proof of stake minting on or off."
@@ -88,7 +88,7 @@ Value setmint(const Array& params, bool fHelp)
 Value gethashespersec(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "gethashespersec\n"
             "Returns a recent hashes per second performance measurement while generating.");
@@ -102,7 +102,7 @@ Value gethashespersec(const Array& params, bool fHelp)
 Value getmininginfo(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getmininginfo\n"
             "Returns an object containing mining-related information.");
@@ -148,7 +148,7 @@ Value GetNetworkHashPS(int lookup) {
 Value getnetworkhashps(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getnetworkhashps [blocks]\n"
             "Returns the estimated network hashes per second based on the last 120 blocks.\n"
@@ -161,7 +161,7 @@ Value getnetworkhashps(const Array& params, bool fHelp)
 Value getworkex(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "getworkex [data, coinbase]\n"
             "If [data, coinbase] is not specified, returns extended work data.\n"
@@ -292,7 +292,7 @@ Value getworkex(const Array& params, bool fHelp)
 Value getwork(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getwork [data]\n"
             "If [data] is not specified, returns formatted hash data to work on:\n"
@@ -410,7 +410,7 @@ Value getwork(const Array& params, bool fHelp)
 Value getblocktemplate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getblocktemplate [params]\n"
             "Returns data needed to construct a block to work on:\n"
@@ -568,7 +568,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
 Value submitblock(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "submitblock <hex data> [optional-params-obj]\n"
             "[optional-params-obj] parameter is currently ignored.\n"

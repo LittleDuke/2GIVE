@@ -194,7 +194,7 @@ string CRPCTable::help(string strCommand) const
 Value help(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "help [command]\n"
             "List commands, or get help for a command.");
@@ -210,7 +210,7 @@ Value help(const Array& params, bool fHelp)
 Value stop(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "stop <detach>\n"
             "<detach> is true or false to detach the database or not for this stop only\n"

@@ -17,7 +17,7 @@ using namespace std;
 Value getconnectioncount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getconnectioncount\n"
             "Returns the number of connections to other nodes.");
@@ -42,7 +42,7 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
 Value getpeerinfo(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getpeerinfo\n"
             "Returns data about each connected network node.");
@@ -80,7 +80,7 @@ Value addnode(const Array& params, bool fHelp)
         strCommand = params[1].get_str();
     if (fHelp || params.size() != 2 ||
         (strCommand != "onetry" && strCommand != "add" && strCommand != "remove"))
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "addnode <node> <add|remove|onetry>\n"
             "Attempts add or remove <node> from the addnode list or try a connection to <node> once.");
@@ -119,7 +119,7 @@ Value addnode(const Array& params, bool fHelp)
 Value getaddednodeinfo(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "getaddednodeinfo <dns> [node]\n"
             "Returns information about the given added node, or all added nodes\n"
@@ -223,7 +223,7 @@ extern map<uint256, CAlert> mapAlerts;
 Value sendalert(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 6)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "sendalert <message> <privatekey> <minver> <maxver> <priority> <id> [cancelupto]\n"
             "<message> is the alert text message\n"

@@ -37,7 +37,7 @@ public:
 Value importprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "importprivkey <2GiveCoinprivkey> [label]\n"
             "Adds a private key (as returned by dumpprivkey) to your wallet.");
@@ -77,7 +77,7 @@ Value importprivkey(const Array& params, bool fHelp)
 Value dumpprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "dumpprivkey <2GiveCoinaddress>\n"
             "Reveals the private key corresponding to <2GiveCoinaddress>.");

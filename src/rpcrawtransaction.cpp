@@ -105,7 +105,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
 Value getrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "getrawtransaction <txid> [verbose=0]\n"
             "If verbose=0, returns a string that is\n"
@@ -141,7 +141,7 @@ Value getrawtransaction(const Array& params, bool fHelp)
 Value listunspent(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 3)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "listunspent [minconf=1] [maxconf=9999999]  [\"address\",...]\n"
             "Returns array of unspent transaction outputs\n"
@@ -210,7 +210,7 @@ Value listunspent(const Array& params, bool fHelp)
 Value createrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "createrawtransaction [{\"txid\":txid,\"vout\":n},...] {address:amount,...}\n"
             "Create a transaction spending given inputs\n"
@@ -276,7 +276,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
 Value decoderawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
-        return NULL;
+        return Value();
 /*dvd        throw runtime_error(
             "decoderawtransaction <hex string>\n"
             "Return a JSON object representing the serialized, hex-encoded transaction.");
@@ -302,7 +302,7 @@ Value decoderawtransaction(const Array& params, bool fHelp)
 Value signrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 4)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "signrawtransaction <hex string> [{\"txid\":txid,\"vout\":n,\"scriptPubKey\":hex},...] [<privatekey1>,...] [sighashtype=\"ALL\"]\n"
             "Sign inputs for raw transaction (serialized, hex-encoded).\n"
@@ -493,7 +493,7 @@ Value signrawtransaction(const Array& params, bool fHelp)
 Value sendrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 1)
-        return NULL;
+        return Value();
 /*        throw runtime_error(
             "sendrawtransaction <hex string>\n"
             "Submits raw transaction (serialized, hex-encoded) to local node and network.");

@@ -4,8 +4,10 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 
+#ifndef Q_MOC_RUN
 #include "util.h" // for uint64
 //#include "banner.h"
+#endif
 
 class StyleSheetEditor;
 
