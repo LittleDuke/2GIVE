@@ -4419,7 +4419,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 
 void static ThreadBitcoinMiner(void* parg);
 
-static bool fGenerateBitcoins = false;
+bool fGenerateBitcoins = false;
 static bool fLimitProcessors = false;
 static int nLimitProcessors = -1;
 
@@ -4661,6 +4661,10 @@ void static ThreadBitcoinMiner(void* parg)
     printf("ThreadBitcoinMiner exiting, %d threads remaining\n", vnThreadsRunning[THREAD_MINER]);
 }
 
+bool SetGenerate(bool fGenerate)
+{
+    return fGenerateBitcoins = fGenerate;
+}
 
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 {

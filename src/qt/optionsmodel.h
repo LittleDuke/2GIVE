@@ -31,7 +31,9 @@ public:
         DetachDatabases,   // bool
         Language,          // QString
 		CoinControlFeatures, // bool
-        OptionIDRowCount,
+        MintingEnabled,     // bool
+        MiningEnabled,       // bool
+        OptionIDRowCount
     };
 
     void Init();
@@ -58,6 +60,8 @@ private:
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
 	bool fCoinControlFeatures;
+    bool fMintingEnabled;
+    bool fMiningEnabled;
     QString language;
 
 signals:

@@ -122,6 +122,8 @@ extern std::map<uint256, CBlock*> mapOrphanBlocks;
 extern int64 nTransactionFee;
 extern int64 nCharityFee;
 
+extern bool fGenerateBitcoins;
+
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
 
@@ -144,6 +146,7 @@ bool ProcessMessages(CNode* pfrom);
 bool SendMessages(CNode* pto, bool fSendTrickle);
 bool LoadExternalBlockFile(FILE* fileIn);
 void StakeCoins(bool fStake, CWallet* pwallet);
+bool SetGenerate(bool fGenerate);
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet);
 CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake=false);
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);

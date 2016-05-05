@@ -6,6 +6,11 @@
 #include "walletdb.h"
 #include "guiutil.h"
 
+#include "bitcoinrpc.h"
+
+extern bool fPosMinting;
+
+
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -49,6 +54,11 @@ void OptionsModel::Init()
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     language = settings.value("language", "").toString();
 
+    fPosMinting = fMintingEnabled = settings.value("fMintingEnabled", fPosMinting).toBool();
+    fMiningEnabled = settings.value("fMiningEnabled", false).toBool();
+    GenerateBitcoins(fMiningEnabled, pwalletMain);
+
+
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
     if (settings.contains("fUseUPnP"))
@@ -61,11 +71,28 @@ void OptionsModel::Init()
         SoftSetBoolArg("-detachdb", settings.value("detachDB").toBool());
     if (!language.isEmpty())
         SoftSetArg("-lang", language.toStdString());
+/*
+    if (settings.contains("fMintingEnabled"))
+        SoftSetBoolArg("-mint", settings.value("fMintingEnabled").toBool());
+    else
+        fMintingEnabled = settings.value("fMintingEnabled", true).toBool();
+
+    if (settings.contains("fMiningEnabled"))
+        SoftSetBoolArg("-gen", settings.value("fMiningEnabled").toBool());
+    else
+        fMiningEnabled = settings.value("fMiningEnabled", false).toBool();
+*/
 }
 
 bool OptionsModel::Upgrade()
 {
     QSettings settings;
+
+    if (!settings.contains("fMintingEnabled"))
+        settings.setValue("fMintingEnabled", fPosMinting);
+
+    if (!settings.contains("fMiningEnabled"))
+        settings.setValue("fMiningEnabled", false);
 
     if (settings.contains("bImportFinished"))
         return false; // Already upgraded
@@ -87,7 +114,7 @@ bool OptionsModel::Upgrade()
         }
     }
     QList<QString> boolOptions;
-    boolOptions << "bDisplayAddresses" << "fMinimizeToTray" << "fMinimizeOnClose" << "fUseProxy" << "fUseUPnP";
+    boolOptions << "bDisplayAddresses" << "fMinimizeToTray" << "fMinimizeOnClose" << "fUseProxy" << "fUseUPnP" << "fMintingEnabled" << "fMiningEnabled";
     foreach(QString key, boolOptions)
     {
         bool value = false;
@@ -137,6 +164,10 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
         {
         case StartAtStartup:
             return QVariant(GUIUtil::GetStartOnSystemStartup());
+        case MintingEnabled:
+            return QVariant(fMintingEnabled);
+        case MiningEnabled:
+            return QVariant(fMiningEnabled);
         case MinimizeToTray:
             return QVariant(fMinimizeToTray);
         case MapPortUPnP:
@@ -183,6 +214,7 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     bool successful = true; /* set to false on parse error */
+
     if(role == Qt::EditRole)
     {
         QSettings settings;
@@ -268,6 +300,18 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             emit coinControlFeaturesChanged(fCoinControlFeatures);
             }
             break;
+        case MintingEnabled:
+            fMintingEnabled = value.toBool();
+            settings.setValue("fMintingEnabled", fMintingEnabled);
+            fPosMinting = fMintingEnabled;
+            break;
+        case MiningEnabled:
+            fMiningEnabled = value.toBool();
+            settings.setValue("fMiningEnabled", fMiningEnabled);
+//            printf("fMiningEnabled = %d\n", fMiningEnabled);
+            SoftSetBoolArg("-gen", settings.value("fMiningEnabled").toBool());
+            GenerateBitcoins(fMiningEnabled, pwalletMain);
+            break;
         default:
             break;
         }
@@ -307,3 +351,4 @@ bool OptionsModel::getDisplayAddresses()
 {
     return bDisplayAddresses;
 }
+
