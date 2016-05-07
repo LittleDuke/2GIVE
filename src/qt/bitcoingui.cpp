@@ -3,6 +3,7 @@
  *
  * W.J. van der Laan 2011-2012
  * The Bitcoin Developers 2011-2012
+ * Strength In Numbers Foundation 2016
  */
 #include "bitcoingui.h"
 #include "transactiontablemodel.h"
@@ -207,11 +208,14 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     frameBlocksLayout->setContentsMargins(3,0,3,0);
     frameBlocksLayout->setSpacing(3);
     labelEncryptionIcon = new QLabel();
+    labelMiningIcon = new QLabel();
     labelMintingIcon = new QLabel();
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelEncryptionIcon);
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelMiningIcon);
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelMintingIcon);
     frameBlocksLayout->addStretch();
@@ -220,10 +224,17 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
 
+    // Set mining pixmap
+    updateMiningIcon();
+    // Add timer to update mining icon
+    QTimer *timerMiningIcon = new QTimer(labelMiningIcon);
+    timerMiningIcon->start(MODEL_UPDATE_DELAY);
+    connect(timerMiningIcon, SIGNAL(timeout()), this, SLOT(updateMiningIcon()));
+
     // Set minting pixmap
-    labelMintingIcon->setPixmap(QIcon(":/icons/cwc-icon-stake-small").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-    labelMintingIcon->setEnabled(false);
     // Add timer to update minting icon
+    updateMintingIcon();
+
     QTimer *timerMintingIcon = new QTimer(labelMintingIcon);
     timerMintingIcon->start(MODEL_UPDATE_DELAY);
     connect(timerMintingIcon, SIGNAL(timeout()), this, SLOT(updateMintingIcon()));
@@ -1083,8 +1094,23 @@ void BitcoinGUI::toggleHidden()
     showNormalIfMinimized(true);
 }
 
+void BitcoinGUI::updateMiningIcon()
+{
+    if (fGenerateBitcoins) {
+        labelMiningIcon->setPixmap(QIcon(":/icons/Rewards16G").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelMiningIcon->setEnabled(true);
+        labelMiningIcon->setToolTip(tr("Competing for block rewards by mining (POW)"));
+    } else {
+        labelMiningIcon->setPixmap(QIcon(":/icons/Rewards16").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelMiningIcon->setEnabled(false);
+        labelMiningIcon->setToolTip(tr("Not competing for block rewards"));
+    }
+}
+
 void BitcoinGUI::updateMintingIcon()
 {
+    labelMintingIcon->setPixmap(QIcon(":/icons/Interest16").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+
     if (pwalletMain && pwalletMain->IsLocked())
     {
         labelMintingIcon->setToolTip(tr("Not minting because wallet is locked."));
@@ -1127,6 +1153,7 @@ void BitcoinGUI::updateMintingIcon()
             text = tr("%n day(s)", "", nEstimateTime/(60*60*24));
         }
 
+        labelMintingIcon->setPixmap(QIcon(":/icons/Interest16G").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         labelMintingIcon->setEnabled(true);
         labelMintingIcon->setToolTip(tr("Minting.<br>Your weight is %1.<br>Network weight is %2.<br>Expected time to earn reward is %3.").arg(nWeight).arg(nNetworkWeight).arg(text));
     }

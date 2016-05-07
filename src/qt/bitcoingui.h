@@ -78,6 +78,7 @@ private:
     SignVerifyMessageDialog *signVerifyMessageDialog;
 
     QLabel *labelEncryptionIcon;
+    QLabel *labelMiningIcon;
     QLabel *labelMintingIcon;
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
@@ -202,6 +203,9 @@ private slots:
     void showNormalIfMinimized(bool fToggleHidden = false);
     /** simply calls showNormalIfMinimized(true) for use in SLOT() macro */
     void toggleHidden();
+
+    /** Update info about mining */
+    void updateMiningIcon();
 
     /** Update info about minting */
     void updateMintingIcon();

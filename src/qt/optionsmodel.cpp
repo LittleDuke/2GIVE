@@ -45,6 +45,8 @@ void OptionsModel::Init()
 {
     QSettings settings;
 
+    printf("OptionsModel::Init()\n");
+
     // These are Qt-only settings:
     nDisplayUnit = settings.value("nDisplayUnit", BitcoinUnits::BTC).toInt();
     bDisplayAddresses = settings.value("bDisplayAddresses", false).toBool();
@@ -56,8 +58,8 @@ void OptionsModel::Init()
 
     fPosMinting = fMintingEnabled = settings.value("fMintingEnabled", fPosMinting).toBool();
     fMiningEnabled = settings.value("fMiningEnabled", false).toBool();
-    GenerateBitcoins(fMiningEnabled, pwalletMain);
-
+    if (fMiningEnabled)
+        SoftSetBoolArg("-gen", true);
 
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
