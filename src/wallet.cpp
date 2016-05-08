@@ -1416,13 +1416,6 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 wtxNew.vout.clear();
                 wtxNew.fFromMe = true;
 
-                // We set the charity Address (different for testnet)
-                CScript scriptCharityPubKey;
-                if (fTestNet) {
-                    scriptCharityPubKey.SetDestination(CBitcoinAddress(CHARITY_ADDRESS_TESTNET).Get());
-                } else {
-                    scriptCharityPubKey.SetDestination(CBitcoinAddress(CHARITY_ADDRESS).Get());
-                }
                 nCharityRet = 0;
                 //std::vector<std::pair<CScript, > > vecSend;
                 std::pair<CScript, int64> transPair;
@@ -1435,10 +1428,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
 
                     transValue = transPair.second;
 
-                    if (transAddress != scriptCharityPubKey)
-                    {
-                        nCharityRet += transValue * 0.001;
-                    }
+                    nCharityRet += transValue * 0.001;
                 }
 
 // dvd test to make sure that there will be a balance post TX and if so send 10% of it back to wallet
@@ -1479,13 +1469,6 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     nFeeRet += nMoveToFee;
                 }
 
-                // ppcoin: sub-cent change is moved to fee
-                if (nChange > 0 && nChange < MIN_TXOUT_AMOUNT)
-                {
-                    nFeeRet += nChange;
-                    nChange = 0;
-                }
-
                 if (nChange > 0)
                 {
                    
@@ -1493,61 +1476,23 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     // TODO: pass in scriptChange instead of reservekey so
                     // change transaction isn't always pay-to-bitcoin-address
                     CScript scriptChange;
-					
-                     // coin control: send change to custom address
-                     if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
-                         scriptChange.SetDestination(coinControl->destChange);
-
-
-                     else
-                     {
-
-// dvd send change to originating coin
-
-//                         CPubKey vchPubKey = CWallet::vchDefaultKey;
-//                         scriptChange.SetDestination(vchPubKey.GetID());
 
 // dvd send change to default account ""
 
-                         CWalletDB walletdb(pwalletMain->strWalletFile);
+                    CWalletDB walletdb(pwalletMain->strWalletFile);
 
-                         CAccount account;
-                         walletdb.ReadAccount("", account);
+                    CAccount account;
+                    walletdb.ReadAccount("", account);
 
-//                         bool bKeyUsed = false;
+                    if (account.vchPubKey.IsValid()) {
+                       scriptChange.SetDestination(account.vchPubKey.GetID());
+                    }
+                    else  // dvd this highly exceptional and must abort
+                       return false;
 
-                         // Check if the current key has been used
-                         if (account.vchPubKey.IsValid()) {
-                             scriptChange.SetDestination(account.vchPubKey.GetID());
-                         }
-/*
-                             CScript scriptPubKey;
-                             scriptPubKey.SetDestination(account.vchPubKey.GetID());
-                             for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin();
-                                  it != pwalletMain->mapWallet.end() && account.vchPubKey.IsValid();
-                                  ++it)
-                             {
-                                 const CWalletTx& wtx = (*it).second;
-                                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-                                     if (txout.scriptPubKey == scriptPubKey)
-                                         bKeyUsed = true;
-                             }
-                         }
-*/
-
-                         // no coin control: send change to newly generated address
-
-                         // Note: We use a new key here to keep it from being obvious which side is the change.
-                         //  The drawback is that by not reusing a previous key, the change may be lost if a
-                         //  backup is restored, if the backup doesn't have the new private key for the change.
-                         //  If we reused the old key, it would be possible to add code to look for and
-                         //  rediscover unknown transactions that were written with keys of ours to recover
-                         //  post-backup change.
- 
-                         // Reserve a new key pair from key pool
-// dvd disable                         CPubKey vchPubKey = reservekey.GetReservedKey();
-//                         scriptChange.SetDestination(vchPubKey.GetID());
-                     }
+                     // coin control: send change to custom address
+                     if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
+                         scriptChange.SetDestination(coinControl->destChange);
 
                      if (true) {
                          // dvd collapse code
@@ -1566,19 +1511,6 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 else
                     reservekey.ReturnKey();
 
-
-//dvd TBD
-//                if (nCharityRet > 0)
-                if (false)
-                {
-                    // We inject the charity amount as a normal tx transaction with destination the charity Address
-
-                    // Insert charity txn at random position:
-                    vector<CTxOut>::iterator position = wtxNew.vout.begin()+GetRandInt(wtxNew.vout.size());
-                    wtxNew.vout.insert(position, CTxOut(nCharityRet, scriptCharityPubKey));
-
-                }
-
                 // Fill vin
                 BOOST_FOREACH(const PAIRTYPE(const CWalletTx*,unsigned int)& coin, setCoins)
                     wtxNew.vin.push_back(CTxIn(coin.first->GetHash(),coin.second));
@@ -1596,14 +1528,20 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 dPriority /= nBytes;
 
                 // Check that enough fee is included
-                int64 nPayFee = nTransactionFee * (1 + (int64)nBytes / 1000);
+/*dvd                int64 nPayFee = nTransactionFee * (1 + (int64)nBytes / 1000);
                 int64 nMinFee = wtxNew.GetMinFee(1, false, GMF_SEND, nBytes);
-
                 if (nFeeRet < max(nPayFee, nMinFee))
                 {
                     nFeeRet = max(nPayFee, nMinFee);
                     continue;
                 }
+*/
+
+                if (nFeeRet < nValue * 0.01) {
+                    nFeeRet = nValue * 0.01;
+                    continue;
+                }
+
 
                 // Fill vtxPrev by copying from previous transactions vtxPrev
                 wtxNew.AddSupportingTransactions(txdb);

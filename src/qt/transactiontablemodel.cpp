@@ -375,13 +375,13 @@ QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord *wtx
     case TransactionRecord::Generated:
         {
             QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit);
-            float dd = str.toFloat();
+//            float dd = str.toFloat();
             return QIcon(":/icons/Rewards20");
         }
     case TransactionRecord::StakeMint:
 		{
 			QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit);
-			float dd = str.toFloat();
+//			float dd = str.toFloat();
             return QIcon(":/icons/Interest16");
 		}
     case TransactionRecord::RecvWithAddress:
