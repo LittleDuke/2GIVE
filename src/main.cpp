@@ -2103,16 +2103,18 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot) const
         return DoS(100, error("CheckBlock() : non-value added block"));
 
     if (fDebug)
+//    if (true)
     {
         // Check timestamp
         int64 nntime = GetBlockTime();
         int64 nnadjtime = GetAdjustedTime();
         int64 nndtime = nnadjtime + nMaxClockDrift;
 
-        printf("getblocktime actual: %lld, expected: %lld", GetBlockTime(), GetAdjustedTime() + nMaxClockDrift);
+        printf("getblocktime actual: %lld, expected: %lld\n", GetBlockTime(), FutureDrift(GetAdjustedTime()));
     }
 
-    if (GetBlockTime() > GetAdjustedTime() + nMaxClockDrift)
+//dvd    if (GetBlockTime() > GetAdjustedTime() + nMaxClockDrift)
+    if (GetBlockTime() > FutureDrift(GetAdjustedTime()))
         return error("CheckBlock() : block timestamp too far in the future");
 
     // First transaction must be coinbase, the rest must not be
@@ -2132,8 +2134,9 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot) const
         return error("CheckBlock() : coinbase output not empty for proof-of-stake block");
 
     // Check coinbase timestamp
-    if (GetBlockTime() > (int64)vtx[0].nTime + nMaxClockDrift)
-        return DoS(50, error("CheckBlock() : coinbase timestamp is too early"));
+//dvd    if (GetBlockTime() > (int64)vtx[0].nTime + nMaxClockDrift)
+    if (GetBlockTime() < PastDrift((int64)vtx[0].nTime))
+        return DoS(50, error("CheckBlock() : coinbase timestamp is too late"));
 
     // Check coinstake timestamp
     if (IsProofOfStake() && !CheckCoinStakeTimestamp(GetBlockTime(), (int64)vtx[1].nTime))
