@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>400</height>
+    <width>644</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -113,7 +113,9 @@ Copyright © 2016 Strength in Numbers Foundation
        </property>
        <property name="text">
         <string>
-This is experimental software. If you don't treat it as such, you're likely to put an eye out!
+This is experimental software!  Backup your wallet early and often :-)
+
+Special thanks to PEACETIME PROPAGANDA for the icon refresh &lt;3
 
 Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
