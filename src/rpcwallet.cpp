@@ -1413,6 +1413,10 @@ Value keypoolrefill(const Array& params, bool fHelp)
             "Fills the keypool."
             + HelpRequiringPassphrase());
 */
+//dvd at request of Bittrex, since 2GIVE doesn't use a keypool, just return TRUE
+
+    return Value::null;
+
     EnsureWalletIsUnlocked();
 
     pwalletMain->TopUpKeyPool();
