@@ -487,7 +487,7 @@ namespace Checkpoints
 
 //dvd tbd
 // ppcoin: sync-checkpoint master key
-const std::string CSyncCheckpoint::strMasterPubKey = "04929f985b460ba075ac227289d79626854367d05861bf6aaae069ef9d2a299bd06de76183cb873235523b714e355a973c8ef7ee37245318b9e994965ea6506d28";
+const std::string CSyncCheckpoint::strMasterPubKey = "04af5bbbc222d254ad59ea0cb9debb33c000f054505016bfc7e5dca8df905d6846a4c484a83c0157dd662064dc0ee45b43abc14af4056d93ad482235058a2d4a57";
 
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 
