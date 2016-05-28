@@ -147,13 +147,13 @@ string CRPCTable::help(string strCommand) const
     {
         const CRPCCommand *pcmd = mi->second;
         string strMethod = mi->first;
-        printf("strMethod = %s\n", strMethod.c_str());
+//        printf("strMethod = %s\n", strMethod.c_str());
         // We already filter duplicates, but these deprecated screw up the sort order
         if (strMethod.find("label") != string::npos)
             continue;
         if (strCommand != "" && strMethod != strCommand)
             continue;
-        printf("try\n");
+//        printf("try\n");
         try
         {
             Array params;
