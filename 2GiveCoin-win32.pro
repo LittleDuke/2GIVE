@@ -233,6 +233,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
     src/qt/addresstablemodel.cpp \
     src/qt/giftcardtablemodel.cpp \
+    src/qt/giftcardpage.cpp \
     src/qt/creategiftdialog.cpp \
     src/qt/paperwallet.cpp \
     src/qt/optionsdialog.cpp \
