@@ -243,7 +243,7 @@ void GiftCardPage::on_newAddressButton_clicked()
                     this, tr("Save Gift* Card"), defaultFileName, tr(".html"));
 
         if (!fileName.isNull()) {
-            PaperWallet pWallet = PaperWallet::PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
+            PaperWallet pWallet = PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
             if (pWallet.genWallet()) {
                 QFile file(fileName);
                 if (file.exists()) {
