@@ -77,7 +77,7 @@
      <item>
       <widget class="QToolButton" name="templateButton">
        <property name="text">
-        <string>Update Templates</string>
+        <string>Update Template</string>
        </property>
       </widget>
      </item>

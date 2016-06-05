@@ -239,8 +239,10 @@ void GiftCardPage::on_newAddressButton_clicked()
 
         QString defaultFileName = filePath + QDir::separator() + giftKeys.at(0) + ".html";
 
+        printf("defaultFileName = %s\n", defaultFileName.toStdString().c_str());
+
         QString fileName = GUIUtil::getSaveFileName(
-                    this, tr("Save Gift* Card"), defaultFileName, tr(".html"));
+                    this, tr("Save Gift* Card"), defaultFileName, tr("Cards (*.html)"));
 
         if (!fileName.isNull()) {
             PaperWallet pWallet = PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");

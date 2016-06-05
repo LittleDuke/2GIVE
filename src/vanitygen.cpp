@@ -42,9 +42,9 @@
 
 // util.c
 
-#if defined(_WIN32)
+#if defined(WIN32)
 #define _USE_MATH_DEFINES
-#endif /* defined(_WIN32) */
+#endif /* defined(WIN32) */
 
 
 #include "vanitygen.h"
@@ -60,7 +60,7 @@ char VG_PRV_KEY_BUF[VG_PROTKEY_MAX_B58];
 
 // winglue.c
 
-#if defined(_WIN32)
+#if defined(WIN32)
 
 #include <windows.h>
 #include <stdio.h>
@@ -261,9 +261,9 @@ __initptw32(void)
     pthread_win32_process_attach_np();
     return 0;
 }
-#endif // defined(_WIN32)
+#endif // defined(WIN32)
 
-#endif // defined(_WIN32)
+#endif // defined(WIN32)
 
 
 
@@ -1524,7 +1524,7 @@ out:
 }
 
 
-#if !defined(_WIN32)
+#if !defined(WIN32)
 int
 count_processors(void)
 {
@@ -3743,7 +3743,7 @@ main(int argc, char **argv)
 
 	if (seedfile) {
 		opt = -1;
-#if !defined(_WIN32)
+#if !defined(WIN32)
 		{	struct stat st;
 			if (!stat(seedfile, &st) &&
 			    (st.st_mode & (S_IFBLK|S_IFCHR))) {

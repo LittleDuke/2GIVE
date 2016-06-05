@@ -30,7 +30,7 @@
 
 #include <pthread.h>
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <windows.h>
 #include <tchar.h>
 #include <time.h>
