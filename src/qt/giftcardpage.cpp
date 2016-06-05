@@ -4,7 +4,7 @@
 #include "giftcardpage.h"
 #include "ui_giftcardpage.h"
 
-#include "giftcardtableModel.h"
+#include "giftcardtablemodel.h"
 #include "optionsmodel.h"
 #include "bitcoingui.h"
 #include "creategiftdialog.h"
