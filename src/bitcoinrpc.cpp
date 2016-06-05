@@ -259,7 +259,7 @@ static const CRPCCommand vRPCCommands[] =
   { "getinfo",                &getinfo,                true,   false,     "getinfo\nReturns an object containing various state info." },
   { "getmininginfo",          &getmininginfo,          true,   false,     "getmininginfo\nReturns an object containing mining-related information." },
   { "getmint",                &getmint,                true,   false,     "getmint\nReturns true or false" },
-  { "getnewaddress",          &getnewaddress,          true,   false,     "getnewaddress [account]\nReturns a new 2GiveCoin address for receiving payments.\nIf [account] is specified (recommended), it is added to the address book\nso payments received with the address will be credited to [account]." },
+  { "getnewaddress",          &getnewaddress,          true,   false,     "getnewaddress [account] [prefix]\nReturns a new 2GiveCoin address for receiving payments.\nIf [account] is specified (recommended), it is added to the address book\nso payments received with the address will be credited to [account]." },
   { "getnewpubkey",           &getnewpubkey,           true,   false,     "getnewpubkey [account]\nReturns new public key for coinbase generation." },
   { "getpeerinfo",            &getpeerinfo,            true,   false,     "getpeerinfo\nReturns data about each connected network node." },
   { "getrawmempool",          &getrawmempool,          true,   false,     "getrawmempool\nReturns all transaction ids in memory pool." },

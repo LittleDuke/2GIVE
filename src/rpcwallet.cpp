@@ -130,16 +130,21 @@ Value getnewaddress(const Array& params, bool fHelp)
     if (fHelp || params.size() > 1)
         return Value();
 /*dvd        throw runtime_error(
-            "getnewaddress [account]\n"
+            "getnewaddress [account] [prefix]\n"
             "Returns a new 2GiveCoin address for receiving payments.  "
             "If [account] is specified (recommended), it is added to the address book "
-            "so payments received with the address will be credited to [account].");
+            "so payments received with the address will be credited to [account]."
+            "If [prefix] is specified (careful), the generator will try and find an address matching that prefix");
 */
     // Parse the account first so we don't generate a key if there's an error
     string strAccount;
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
-
+/* dvd tbd
+    string strPrefix;
+    if (params.size() > 1)
+        strPrefix = AccountFromValue(params[1]);
+*/
     if (!pwalletMain->IsLocked())
         pwalletMain->TopUpKeyPool();
 

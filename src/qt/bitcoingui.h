@@ -17,6 +17,7 @@ class WalletModel;
 class TransactionView;
 class OverviewPage;
 class AddressBookPage;
+class GiftCardPage;
 class SendCoinsDialog;
 class GiftCoinsDialog;
 class SignVerifyMessageDialog;
@@ -74,6 +75,7 @@ private:
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
+    GiftCardPage *giftCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
 
@@ -169,7 +171,7 @@ private slots:
     void gotoSendCoinsPage();
     /** Switch to send coins page and set charity wallet as receipient*/
     void gotoSendCoinsCharityPage();
-    /** Switch to gift coins page and set charity wallet as receipient*/
+    /** Switch to gift coins page */
     void gotoGiftCoinsPage();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */

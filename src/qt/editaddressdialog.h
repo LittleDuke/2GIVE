@@ -23,7 +23,7 @@ public:
         NewReceivingAddress,
         NewSendingAddress,
         EditReceivingAddress,
-        EditSendingAddress
+        EditSendingAddress,
     };
 
     explicit EditAddressDialog(Mode mode, QWidget *parent = 0);

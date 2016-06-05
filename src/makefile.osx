@@ -43,6 +43,7 @@ LIBS += \
  $(DEPSDIR)/lib/libboost_thread-mt.a \
  $(DEPSDIR)/lib/libssl.a \
  $(DEPSDIR)/lib/libcrypto.a \
+ $(DEPSDIR)/lib/libpcre.a \
  -lz
 else
 TESTLIBS += \
@@ -55,7 +56,8 @@ LIBS += \
  -lboost_thread-mt \
  -lssl \
  -lcrypto \
- -lz
+ -lz \
+ -lpcre
 TESTDEFS += -DBOOST_TEST_DYN_LINK
 endif
 
@@ -106,7 +108,9 @@ OBJS= \
     obj/scrypt.o \
     obj/scrypt_mine.o \
     obj/scrypt-x86.o \
-    obj/scrypt-x86_64.o
+    obj/scrypt-x86_64.o \
+    obj/vanitygen.o 
+
 
 ifndef USE_UPNP
 	override USE_UPNP = -
@@ -124,7 +128,7 @@ ifneq (${USE_IPV6}, -)
 	DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
 
-all: 2GiveCoind
+all: 2GiveCoind vanitygen
 
 test check: test_2GiveCoin FORCE
 	./test_2GiveCoin
@@ -157,6 +161,9 @@ obj/scrypt-x86_64.o: scrypt-x86_64.S
 2GiveCoind: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
+vanitygen: vanitygen.cpp
+	$(CXX) -DVANITY_MAIN $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
+	
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
 
 obj-test/%.o: test/%.cpp

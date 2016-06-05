@@ -1,25 +1,37 @@
-#include "addressbookpage.h"
-#include "ui_addressbookpage.h"
+// Copyright 2016 Strength in Numbers Foundation
 
-#include "addresstablemodel.h"
+
+#include "giftcardpage.h"
+#include "ui_giftcardpage.h"
+
+#include "giftcardtableModel.h"
 #include "optionsmodel.h"
 #include "bitcoingui.h"
-#include "editaddressdialog.h"
+#include "creategiftdialog.h"
 #include "csvmodelwriter.h"
 #include "guiutil.h"
+#include "paperwallet.h"
 
 #include <QSortFilterProxyModel>
 #include <QClipboard>
 #include <QMessageBox>
 #include <QMenu>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QDesktopServices>     // dvd add for launching URL
+#include <QUrl>                 // dvd add for launching URL
 
 #ifdef USE_QRCODE
 #include "qrcodedialog.h"
 #endif
 
-AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
+extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
+
+
+GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::AddressBookPage),
+    ui(new Ui::GiftCardPage),
     model(0),
     optionsModel(0),
     mode(mode),
@@ -29,6 +41,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
 
 #ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     ui->newAddressButton->setIcon(QIcon());
+    ui->templateButton->setIcon(QIcon());
     ui->copyToClipboard->setIcon(QIcon());
     ui->deleteButton->setIcon(QIcon());
 #endif
@@ -48,25 +61,19 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
         ui->buttonBox->setVisible(false);
         break;
     }
-    switch(tab)
-    {
-    case SendingTab:
-        ui->labelExplanation->setVisible(false);
-        ui->deleteButton->setVisible(true);
-        ui->signMessage->setVisible(false);
-        break;
-    case ReceivingTab:
-        ui->deleteButton->setVisible(false);
-        ui->signMessage->setVisible(true);
-        break;
-    }
+
+    ui->labelExplanation->setVisible(true);
+    ui->deleteButton->setVisible(true);
+    ui->signMessage->setVisible(false);
+
+//dvd considering adding a "Give" option from the right click
 
     // Context menu actions
     QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *copyAddressAction = new QAction(ui->copyToClipboard->text(), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
     QAction *showQRCodeAction = new QAction(ui->showQRCode->text(), this);
-    QAction *signMessageAction = new QAction(ui->signMessage->text(), this);
+//    QAction *signMessageAction = new QAction(ui->signMessage->text(), this);
     QAction *verifyMessageAction = new QAction(ui->verifyMessage->text(), this);
     deleteAction = new QAction(ui->deleteButton->text(), this);
 
@@ -75,14 +82,10 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(editAction);
-    if(tab == SendingTab)
-        contextMenu->addAction(deleteAction);
+    contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
     contextMenu->addAction(showQRCodeAction);
-    if(tab == ReceivingTab)
-        contextMenu->addAction(signMessageAction);
-    else if(tab == SendingTab)
-        contextMenu->addAction(verifyMessageAction);
+    contextMenu->addAction(verifyMessageAction);
 
     // Connect signals for context menu actions
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(on_copyToClipboard_clicked()));
@@ -90,21 +93,25 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(editAction, SIGNAL(triggered()), this, SLOT(onEditAction()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(on_deleteButton_clicked()));
     connect(showQRCodeAction, SIGNAL(triggered()), this, SLOT(on_showQRCode_clicked()));
-    connect(signMessageAction, SIGNAL(triggered()), this, SLOT(on_signMessage_clicked()));
+//    connect(signMessageAction, SIGNAL(triggered()), this, SLOT(on_signMessage_clicked()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(on_verifyMessage_clicked()));
 
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
     // Pass through accept action from button box
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+
+    // Set default filepath to save to
+    filePath = QDir::homePath();
+    printf("homePath = %s\n", filePath.toStdString().c_str());
 }
 
-AddressBookPage::~AddressBookPage()
+GiftCardPage::~GiftCardPage()
 {
     delete ui;
 }
 
-void AddressBookPage::setModel(AddressTableModel *model)
+void GiftCardPage::setModel(GiftCardTableModel *model)
 {
     this->model = model;
     if(!model)
@@ -115,31 +122,22 @@ void AddressBookPage::setModel(AddressTableModel *model)
     proxyModel->setDynamicSortFilter(true);
     proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    switch(tab)
-    {
-    case ReceivingTab:
-        // Receive filter
-        proxyModel->setFilterRole(AddressTableModel::TypeRole);
-        proxyModel->setFilterFixedString(AddressTableModel::Receive);
-        break;
-    case SendingTab:
-        // Send filter
-        proxyModel->setFilterRole(AddressTableModel::TypeRole);
-        proxyModel->setFilterFixedString(AddressTableModel::Send);
-        break;
-    }
+
+    proxyModel->setFilterRole(GiftCardTableModel::TypeRole);
+    proxyModel->setFilterFixedString(GiftCardTableModel::Gift);
+
     ui->tableView->setModel(proxyModel);
     ui->tableView->sortByColumn(0, Qt::AscendingOrder);
 
     // Set column widths
 #if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->resizeSection(
-            AddressTableModel::Address, 333);
+            GiftCardTableModel::Address, 333);
     ui->tableView->horizontalHeader()->setResizeMode(
-            AddressTableModel::Label, QHeaderView::Stretch);
+            GiftCardTableModel::Label, QHeaderView::Stretch);
 #else
-    ui->tableView->horizontalHeader()->setSectionResizeMode(AddressTableModel::Label, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(AddressTableModel::Address, QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(GiftCardTableModel::Label, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(GiftCardTableModel::Address, QHeaderView::ResizeToContents);
 #endif
 
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
@@ -152,22 +150,22 @@ void AddressBookPage::setModel(AddressTableModel *model)
     selectionChanged();
 }
 
-void AddressBookPage::setOptionsModel(OptionsModel *optionsModel)
+void GiftCardPage::setOptionsModel(OptionsModel *optionsModel)
 {
     this->optionsModel = optionsModel;
 }
 
-void AddressBookPage::on_copyToClipboard_clicked()
+void GiftCardPage::on_copyToClipboard_clicked()
 {
-    GUIUtil::copyEntryData(ui->tableView, AddressTableModel::Address);
+    GUIUtil::copyEntryData(ui->tableView, GiftCardTableModel::Address);
 }
 
-void AddressBookPage::onCopyLabelAction()
+void GiftCardPage::onCopyLabelAction()
 {
-    GUIUtil::copyEntryData(ui->tableView, AddressTableModel::Label);
+    GUIUtil::copyEntryData(ui->tableView, GiftCardTableModel::Label);
 }
 
-void AddressBookPage::onEditAction()
+void GiftCardPage::onEditAction()
 {
     if(!ui->tableView->selectionModel())
         return;
@@ -176,10 +174,7 @@ void AddressBookPage::onEditAction()
         return;
 
 
-    EditAddressDialog dlg(
-            tab == SendingTab ?
-            EditAddressDialog::EditSendingAddress :
-            EditAddressDialog::EditReceivingAddress);
+    CreateGiftDialog dlg(CreateGiftDialog::EditGiftAddress);
 
     dlg.setModel(model);
     QModelIndex origIndex = proxyModel->mapToSource(indexes.at(0));
@@ -188,10 +183,10 @@ void AddressBookPage::onEditAction()
 
 }
 
-void AddressBookPage::on_signMessage_clicked()
+void GiftCardPage::on_signMessage_clicked()
 {
     QTableView *table = ui->tableView;
-    QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QModelIndexList indexes = table->selectionModel()->selectedRows(GiftCardTableModel::Address);
     QString addr;
 
     foreach (QModelIndex index, indexes)
@@ -203,10 +198,10 @@ void AddressBookPage::on_signMessage_clicked()
     emit signMessage(addr);
 }
 
-void AddressBookPage::on_verifyMessage_clicked()
+void GiftCardPage::on_verifyMessage_clicked()
 {
     QTableView *table = ui->tableView;
-    QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QModelIndexList indexes = table->selectionModel()->selectedRows(GiftCardTableModel::Address);
     QString addr;
 
     foreach (QModelIndex index, indexes)
@@ -218,22 +213,73 @@ void AddressBookPage::on_verifyMessage_clicked()
     emit verifyMessage(addr);
 }
 
-void AddressBookPage::on_newAddressButton_clicked()
+void GiftCardPage::on_newAddressButton_clicked()
 {
+    char    strPubKey[256],
+            strPrivKey[256];
+
     if(!model)
         return;
-    EditAddressDialog dlg(
-                tab == SendingTab ?
-                EditAddressDialog::NewSendingAddress :
-                EditAddressDialog::NewReceivingAddress );
+
+    printf("GiftCardPage::on_newAddressButton(): CreateGiftDialog\n");
+    CreateGiftDialog dlg(CreateGiftDialog::NewGiftAddress);
     dlg.setModel(model);
     if(dlg.exec())
     {
+        printf("GiftCardPage::on_newAddressButton(): dlg.exec()\n");
         newAddressToSelect = dlg.getAddress();
+        QStringList giftKeys = newAddressToSelect.split(":");
+
+        strcpy(strPubKey, giftKeys.at(0).toStdString().c_str());
+        strcpy(strPrivKey, giftKeys.at(1).toStdString().c_str());
+        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
+
+//        QString appDirPath = QCoreApplication::applicationDirPath();
+//        printf("appDirPath = %s\n", appDirPath.toStdString().c_str());
+
+        QString defaultFileName = filePath + QDir::separator() + giftKeys.at(0) + ".html";
+
+        QString fileName = GUIUtil::getSaveFileName(
+                    this, tr("Save Gift* Card"), defaultFileName, tr(".html"));
+
+        if (!fileName.isNull()) {
+            PaperWallet pWallet = PaperWallet::PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
+            if (pWallet.genWallet()) {
+                QFile file(fileName);
+                if (file.exists()) {
+                    // save the user selected folder for easy next use
+                    QFileInfo fileInfo(file.fileName());
+                    filePath = fileInfo.absolutePath();
+
+                    // launch browser to display/print
+                    QString url = "file://" + fileName;
+                    QDesktopServices::openUrl(QUrl(url));
+                }
+            }
+        }
     }
 }
 
-void AddressBookPage::on_deleteButton_clicked()
+void GiftCardPage::on_templateButton_clicked()
+{
+    QMessageBox msgBox;
+
+    msgBox.setWindowTitle("Update Templates");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+    PaperWallet pWallet = PaperWallet::PaperWallet("", "", "", "");
+
+    if (pWallet.updateTemplates())
+        msgBox.setText("Template Update Successful");
+    else {
+        msgBox.setText("Template Update Failed");
+        msgBox.setInformativeText("Check your network connectivity and retry");
+    }
+    msgBox.exec();
+}
+
+void GiftCardPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;
     if(!table->selectionModel())
@@ -245,7 +291,7 @@ void AddressBookPage::on_deleteButton_clicked()
     }
 }
 
-void AddressBookPage::selectionChanged()
+void GiftCardPage::selectionChanged()
 {
     // Set button states based on selected tab and selection
     QTableView *table = ui->tableView;
@@ -254,29 +300,14 @@ void AddressBookPage::selectionChanged()
 
     if(table->selectionModel()->hasSelection())
     {
-        switch(tab)
-        {
-        case SendingTab:
-            // In sending tab, allow deletion of selection
-            ui->deleteButton->setEnabled(true);
-            ui->deleteButton->setVisible(true);
-            deleteAction->setEnabled(true);
-            ui->signMessage->setEnabled(false);
-            ui->signMessage->setVisible(false);
-            ui->verifyMessage->setEnabled(true);
-            ui->verifyMessage->setVisible(true);
-            break;
-        case ReceivingTab:
-            // Deleting receiving addresses, however, is not allowed
-            ui->deleteButton->setEnabled(false);
-            ui->deleteButton->setVisible(false);
-            deleteAction->setEnabled(false);
-            ui->signMessage->setEnabled(true);
-            ui->signMessage->setVisible(true);
-            ui->verifyMessage->setEnabled(false);
-            ui->verifyMessage->setVisible(false);
-            break;
-        }
+        // In gift tab, allow deletion of selection
+        ui->deleteButton->setEnabled(true);
+        ui->deleteButton->setVisible(true);
+        deleteAction->setEnabled(true);
+        ui->signMessage->setEnabled(false);
+        ui->signMessage->setVisible(false);
+        ui->verifyMessage->setEnabled(true);
+        ui->verifyMessage->setVisible(true);
         ui->copyToClipboard->setEnabled(true);
         ui->showQRCode->setEnabled(true);
     }
@@ -290,7 +321,7 @@ void AddressBookPage::selectionChanged()
     }
 }
 
-void AddressBookPage::done(int retval)
+void GiftCardPage::done(int retval)
 {
     QTableView *table = ui->tableView;
     if(!table->selectionModel() || !table->model())
@@ -300,7 +331,7 @@ void AddressBookPage::done(int retval)
         return;
 
     // Figure out which address was selected, and return it
-    QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QModelIndexList indexes = table->selectionModel()->selectedRows(GiftCardTableModel::Address);
 
     foreach (QModelIndex index, indexes)
     {
@@ -317,7 +348,7 @@ void AddressBookPage::done(int retval)
     QDialog::done(retval);
 }
 
-void AddressBookPage::exportClicked()
+void GiftCardPage::exportClicked()
 {
     // CSV is currently the only supported format
     QString filename = GUIUtil::getSaveFileName(
@@ -331,8 +362,8 @@ void AddressBookPage::exportClicked()
 
     // name, column, role
     writer.setModel(proxyModel);
-    writer.addColumn("Label", AddressTableModel::Label, Qt::EditRole);
-    writer.addColumn("Address", AddressTableModel::Address, Qt::EditRole);
+    writer.addColumn("Label", GiftCardTableModel::Label, Qt::EditRole);
+    writer.addColumn("Address", GiftCardTableModel::Address, Qt::EditRole);
 
     if(!writer.write())
     {
@@ -341,11 +372,11 @@ void AddressBookPage::exportClicked()
     }
 }
 
-void AddressBookPage::on_showQRCode_clicked()
+void GiftCardPage::on_showQRCode_clicked()
 {
 #ifdef USE_QRCODE
     QTableView *table = ui->tableView;
-    QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QModelIndexList indexes = table->selectionModel()->selectedRows(GiftCardTableModel::Address);
 
     foreach (QModelIndex index, indexes)
     {
@@ -360,7 +391,7 @@ void AddressBookPage::on_showQRCode_clicked()
 #endif
 }
 
-void AddressBookPage::contextualMenu(const QPoint &point)
+void GiftCardPage::contextualMenu(const QPoint &point)
 {
     QModelIndex index = ui->tableView->indexAt(point);
     if(index.isValid())
@@ -369,9 +400,9 @@ void AddressBookPage::contextualMenu(const QPoint &point)
     }
 }
 
-void AddressBookPage::selectNewAddress(const QModelIndex &parent, int begin, int end)
+void GiftCardPage::selectNewAddress(const QModelIndex &parent, int begin, int end)
 {
-    QModelIndex idx = proxyModel->mapFromSource(model->index(begin, AddressTableModel::Address, parent));
+    QModelIndex idx = proxyModel->mapFromSource(model->index(begin, GiftCardTableModel::Address, parent));
     if(idx.isValid() && (idx.data(Qt::EditRole).toString() == newAddressToSelect))
     {
         // Select row of newly created address, once

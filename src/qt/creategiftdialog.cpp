@@ -1,14 +1,17 @@
-#include "editaddressdialog.h"
-#include "ui_editaddressdialog.h"
-#include "addresstablemodel.h"
+// Copyright 2016 Strength in Numbers Foundation
+
+
+#include "creategiftdialog.h"
+#include "ui_creategiftdialog.h"
+#include "giftcardtablemodel.h"
 #include "guiutil.h"
 
 #include <QDataWidgetMapper>
 #include <QMessageBox>
 
-EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
+CreateGiftDialog::CreateGiftDialog(Mode mode, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::EditAddressDialog), mapper(0), mode(mode), model(0)
+    ui(new Ui::CreateGiftDialog), mapper(0), mode(mode), model(0)
 {
     ui->setupUi(this);
 
@@ -16,19 +19,13 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
 
     switch(mode)
     {
-    case NewReceivingAddress:
-        setWindowTitle(tr("New receiving address"));
+    case NewGiftAddress:
+        setWindowTitle(tr("New Gift* address"));
         ui->addressEdit->setEnabled(false);
         break;
-    case NewSendingAddress:
-        setWindowTitle(tr("New sending address"));
-        break;
-    case EditReceivingAddress:
-        setWindowTitle(tr("Edit receiving address"));
+    case EditGiftAddress:
+        setWindowTitle(tr("Edit Gift* address"));
         ui->addressEdit->setDisabled(true);
-        break;
-    case EditSendingAddress:
-        setWindowTitle(tr("Edit sending address"));
         break;
     }
 
@@ -36,41 +33,36 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
 }
 
-EditAddressDialog::~EditAddressDialog()
+CreateGiftDialog::~CreateGiftDialog()
 {
     delete ui;
 }
 
-void EditAddressDialog::setModel(AddressTableModel *model)
+void CreateGiftDialog::setModel(GiftCardTableModel *model)
 {
     this->model = model;
     mapper->setModel(model);
-    mapper->addMapping(ui->labelEdit, AddressTableModel::Label);
-    mapper->addMapping(ui->addressEdit, AddressTableModel::Address);
+    mapper->addMapping(ui->labelEdit, GiftCardTableModel::Label);
+    mapper->addMapping(ui->addressEdit, GiftCardTableModel::Address);
 }
 
-void EditAddressDialog::loadRow(int row)
+void CreateGiftDialog::loadRow(int row)
 {
     mapper->setCurrentIndex(row);
 }
 
-bool EditAddressDialog::saveCurrentRow()
+bool CreateGiftDialog::saveCurrentRow()
 {
     if(!model)
         return false;
     switch(mode)
     {
-    case NewReceivingAddress:
-    case NewSendingAddress:
-        address = model->addRow(
-                mode == NewSendingAddress ?
-                AddressTableModel::Send :
-                AddressTableModel::Receive,
+    case NewGiftAddress:
+        address = model->addRow(GiftCardTableModel::Gift,
                 ui->labelEdit->text(),
                 ui->addressEdit->text());
         break;
-    case EditReceivingAddress:
-    case EditSendingAddress:
+    case EditGiftAddress:
         if(mapper->submit())
         {
             address = ui->addressEdit->text();
@@ -80,7 +72,7 @@ bool EditAddressDialog::saveCurrentRow()
     return !address.isEmpty();
 }
 
-void EditAddressDialog::accept()
+void CreateGiftDialog::accept()
 {
     if(!model)
         return;
@@ -88,27 +80,27 @@ void EditAddressDialog::accept()
     {
         switch(model->getEditStatus())
         {
-        case AddressTableModel::DUPLICATE_ADDRESS:
+        case GiftCardTableModel::DUPLICATE_ADDRESS:
             QMessageBox::warning(this, windowTitle(),
                 tr("The entered address \"%1\" is already in the address book.").arg(ui->addressEdit->text()),
                 QMessageBox::Ok, QMessageBox::Ok);
             break;
-        case AddressTableModel::INVALID_ADDRESS:
+        case GiftCardTableModel::INVALID_ADDRESS:
             QMessageBox::warning(this, windowTitle(),
                 tr("The entered address \"%1\" is not a valid 2GiveCoin address.").arg(ui->addressEdit->text()),
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
-        case AddressTableModel::WALLET_UNLOCK_FAILURE:
+        case GiftCardTableModel::WALLET_UNLOCK_FAILURE:
             QMessageBox::critical(this, windowTitle(),
                 tr("Could not unlock wallet."),
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
-        case AddressTableModel::KEY_GENERATION_FAILURE:
+        case GiftCardTableModel::KEY_GENERATION_FAILURE:
             QMessageBox::critical(this, windowTitle(),
                 tr("New key generation failed."),
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
-        case AddressTableModel::OK:
+        case GiftCardTableModel::OK:
             // Failed with unknown reason. Just reject.
             break;
         }
@@ -118,12 +110,12 @@ void EditAddressDialog::accept()
     QDialog::accept();
 }
 
-QString EditAddressDialog::getAddress() const
+QString CreateGiftDialog::getAddress() const
 {
     return address;
 }
 
-void EditAddressDialog::setAddress(const QString &address)
+void CreateGiftDialog::setAddress(const QString &address)
 {
     this->address = address;
     ui->addressEdit->setText(address);

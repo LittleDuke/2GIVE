@@ -33,6 +33,34 @@ struct CompareValueOnly
     }
 };
 
+CPubKey CWallet::GenerateCustomKey(const char *prefix)
+{
+    bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
+
+    RandAddSeedPerfmon();
+    CKey key;
+    CPubKey pubKey;
+    CKeyID  pubKeyID;
+
+// dvd
+    printf("Generating an address with prefix %s\n", prefix);
+
+    do {
+        key.MakeNewKey(fCompressed);
+
+    // Compressed public keys were introduced in version 0.6.0
+        if (fCompressed)
+            SetMinVersion(FEATURE_COMPRPUBKEY);
+
+        pubKey = key.GetPubKey();
+        pubKeyID = pubKey.GetID();
+    } while (strncmp(prefix, CBitcoinAddress(pubKeyID).ToString().c_str(), strlen(prefix)));
+
+    printf("wallet.cpp: GenerateCustomKey() ==> %s\n", CBitcoinAddress(pubKeyID).ToString().c_str());
+
+    return key.GetPubKey();
+}
+
 CPubKey CWallet::GenerateNewKey(const char *prefix)
 {
     bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
