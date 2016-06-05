@@ -268,7 +268,7 @@ void GiftCardPage::on_templateButton_clicked()
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
 
-    PaperWallet pWallet = PaperWallet::PaperWallet("", "", "", "");
+    PaperWallet pWallet = PaperWallet("", "", "", "");
 
     if (pWallet.updateTemplates())
         msgBox.setText("Template Update Successful");
