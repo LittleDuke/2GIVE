@@ -38,12 +38,14 @@ public:
         int ypad = 6;
         int halfheight = (mainRect.height() - 2*ypad)/2;
         QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
+        QRect feeRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
         QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
         icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
+        qint64 fee = index.data(TransactionTableModel::FeeRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
         QVariant value = index.data(Qt::ForegroundRole);
         QColor foreground = option.palette.color(QPalette::Text);
@@ -77,6 +79,13 @@ public:
             amountText = QString("[") + amountText + QString("]");
         }
         painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
+
+        QString feeText = BitcoinUnits::formatWithUnit(BitcoinUnits::TXFEE, fee, true);
+        if(!confirmed)
+        {
+            feeText = QString("[") + feeText + QString("]");
+        }
+        painter->drawText(feeRect, Qt::AlignRight|Qt::AlignVCenter, feeText);
 
         painter->setPen(option.palette.color(QPalette::Text));
         painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, GUIUtil::dateTimeStr(date));

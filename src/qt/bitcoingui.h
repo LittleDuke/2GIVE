@@ -17,6 +17,7 @@ class WalletModel;
 class TransactionView;
 class OverviewPage;
 class AddressBookPage;
+class GiftCardPage;
 class SendCoinsDialog;
 class GiftCoinsDialog;
 class SignVerifyMessageDialog;
@@ -74,10 +75,12 @@ private:
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
+    GiftCardPage *giftCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
 
     QLabel *labelEncryptionIcon;
+    QLabel *labelMiningIcon;
     QLabel *labelMintingIcon;
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
@@ -85,6 +88,7 @@ private:
     QProgressBar *progressBar;
 
     QMenuBar *appMenuBar;
+    QAction *giveInfoAction;
     QAction *overviewAction;
     QAction *historyAction;
     QAction *quitAction;
@@ -152,6 +156,9 @@ public slots:
     void handleURI(QString strURI);
 
 private slots:
+    /** Launch Desktop Browser */
+    void gotoGiveInfo();
+
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
@@ -164,7 +171,7 @@ private slots:
     void gotoSendCoinsPage();
     /** Switch to send coins page and set charity wallet as receipient*/
     void gotoSendCoinsCharityPage();
-    /** Switch to gift coins page and set charity wallet as receipient*/
+    /** Switch to gift coins page */
     void gotoGiftCoinsPage();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
@@ -198,6 +205,9 @@ private slots:
     void showNormalIfMinimized(bool fToggleHidden = false);
     /** simply calls showNormalIfMinimized(true) for use in SLOT() macro */
     void toggleHidden();
+
+    /** Update info about mining */
+    void updateMiningIcon();
 
     /** Update info about minting */
     void updateMintingIcon();

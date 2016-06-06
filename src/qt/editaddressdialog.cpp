@@ -63,7 +63,9 @@ bool EditAddressDialog::saveCurrentRow()
     case NewReceivingAddress:
     case NewSendingAddress:
         address = model->addRow(
-                mode == NewSendingAddress ? AddressTableModel::Send : AddressTableModel::Receive,
+                mode == NewSendingAddress ?
+                AddressTableModel::Send :
+                AddressTableModel::Receive,
                 ui->labelEdit->text(),
                 ui->addressEdit->text());
         break;

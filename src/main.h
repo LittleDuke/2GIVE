@@ -88,6 +88,16 @@ static const uint256 hashGenesisBlockOfficial("0x00000a055a8a21ab15d2c24bf576910
 */
 
 static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
+// "timewarp" attack ?
+// http://bitcoinist.net/interview-presstab-pos-vulnerabilities/
+
+// "Security analysis of PoW/PoS hybrids with low PoW reward"
+// https://bitcointalk.org/index.php?topic=551861.0
+
+// static const int64 nMaxClockDrift = 5 * 60 + 30;        // 5 minutes / aligned with 2X target blocktime (nStakeTargetSpacing = 120)
+
+inline int64_t PastDrift(int64_t nTime) { return nTime - (2 * 60 * 60); }   // up to 2hrs from the past
+inline int64_t FutureDrift(int64_t nTime) { return nTime + (2 * 60 * 60); } // up to 2hrs in the future
 
 extern CScript COINBASE_FLAGS;
 
@@ -122,6 +132,8 @@ extern std::map<uint256, CBlock*> mapOrphanBlocks;
 extern int64 nTransactionFee;
 extern int64 nCharityFee;
 
+extern bool fGenerateBitcoins;
+
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
 
@@ -144,6 +156,7 @@ bool ProcessMessages(CNode* pfrom);
 bool SendMessages(CNode* pto, bool fSendTrickle);
 bool LoadExternalBlockFile(FILE* fileIn);
 void StakeCoins(bool fStake, CWallet* pwallet);
+bool SetGenerate(bool fGenerate);
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet);
 CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake=false);
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);

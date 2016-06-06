@@ -21,8 +21,8 @@ Value getgenerate(const Array& params, bool fHelp)
             "getgenerate\n"
             "Returns true or false.");
 */
-
-    return GetBoolArg("-gen");
+    return fGenerateBitcoins;
+//    return GetBoolArg("-gen");
 }
 
 

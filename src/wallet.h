@@ -130,7 +130,11 @@ public:
     bool SelectCoinsMinConfOriginal(int64 nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
     bool SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
     // keystore implementation
-    // Generate a new key
+
+    // Generate a new key but do not store
+    CPubKey GenerateCustomKey(const char *prefix);
+
+    // Generate a new key and add to wallet
     CPubKey GenerateNewKey(const char *prefix);
     // Adds a key to the store, and saves it to disk.
     bool AddKey(const CKey& key);
@@ -309,6 +313,11 @@ public:
      * @note called with lock cs_wallet held.
      */
     boost::signals2::signal<void (CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)> NotifyAddressBookChanged;
+
+    /** Gift card entry changed.
+     * @note called with lock cs_wallet held // Until moved to SQLite
+     */
+    boost::signals2::signal<void (CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)> NotifyGiftCardChanged;
 
     /** Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.

@@ -147,13 +147,13 @@ string CRPCTable::help(string strCommand) const
     {
         const CRPCCommand *pcmd = mi->second;
         string strMethod = mi->first;
-        printf("strMethod = %s\n", strMethod.c_str());
+//        printf("strMethod = %s\n", strMethod.c_str());
         // We already filter duplicates, but these deprecated screw up the sort order
         if (strMethod.find("label") != string::npos)
             continue;
         if (strCommand != "" && strMethod != strCommand)
             continue;
-        printf("try\n");
+//        printf("try\n");
         try
         {
             Array params;
@@ -259,7 +259,7 @@ static const CRPCCommand vRPCCommands[] =
   { "getinfo",                &getinfo,                true,   false,     "getinfo\nReturns an object containing various state info." },
   { "getmininginfo",          &getmininginfo,          true,   false,     "getmininginfo\nReturns an object containing mining-related information." },
   { "getmint",                &getmint,                true,   false,     "getmint\nReturns true or false" },
-  { "getnewaddress",          &getnewaddress,          true,   false,     "getnewaddress [account]\nReturns a new 2GiveCoin address for receiving payments.\nIf [account] is specified (recommended), it is added to the address book\nso payments received with the address will be credited to [account]." },
+  { "getnewaddress",          &getnewaddress,          true,   false,     "getnewaddress [account] [prefix]\nReturns a new 2GiveCoin address for receiving payments.\nIf [account] is specified (recommended), it is added to the address book\nso payments received with the address will be credited to [account]." },
   { "getnewpubkey",           &getnewpubkey,           true,   false,     "getnewpubkey [account]\nReturns new public key for coinbase generation." },
   { "getpeerinfo",            &getpeerinfo,            true,   false,     "getpeerinfo\nReturns data about each connected network node." },
   { "getrawmempool",          &getrawmempool,          true,   false,     "getrawmempool\nReturns all transaction ids in memory pool." },
@@ -267,8 +267,8 @@ static const CRPCCommand vRPCCommands[] =
   { "getreceivedbyaccount",   &getreceivedbyaccount,   false,  false,     "getreceivedbyaccount <account> [minconf=1]\nReturns the total amount received by addresses with <account> in transactions with at least [minconf] confirmations." },
   { "getreceivedbyaddress",   &getreceivedbyaddress,   false,  false,     "getreceivedbyaddress <2GiveCoinaddress> [minconf=1]\nReturns the total amount received by <2GiveCoinaddress> in transactions with at least [minconf] confirmations." },
   { "gettransaction",         &gettransaction,         false,  false,     "gettransaction <txid>\nGet detailed information about <txid>" },
-  { "getwork",                &getwork,                true,   false,     "getwork [data]\nIf [data] is not specified, returns formatted hash data to work on:\n  \"midstate\" : precomputed hash state after hashing the first half of the data (DEPRECATED)\n  \"data\" : block data\n  \"hash1\" : formatted hash buffer for second hash (DEPRECATED)\n  \"target\" : little endian hash target\nIf [data] is specified, tries to solve the block and returns true if it was successful." },
-  { "getworkex",              &getworkex,              true,   false,     "getworkex [data, coinbase]\nIf [data, coinbase] is not specified, returns extended work data.\n" },
+//dvd  { "getwork",                &getwork,                true,   false,     "getwork [data]\nIf [data] is not specified, returns formatted hash data to work on:\n  \"midstate\" : precomputed hash state after hashing the first half of the data (DEPRECATED)\n  \"data\" : block data\n  \"hash1\" : formatted hash buffer for second hash (DEPRECATED)\n  \"target\" : little endian hash target\nIf [data] is specified, tries to solve the block and returns true if it was successful." },
+//dvd  { "getworkex",              &getworkex,              true,   false,     "getworkex [data, coinbase]\nIf [data, coinbase] is not specified, returns extended work data.\n" },
   { "help",                   &help,                   true,   true,      "help [command]\nList commands, or get help for a command." },
   { "importprivkey",          &importprivkey,          false,  false,     "importprivkey <2GiveCoinprivkey> [label]\nAdds a private key (as returned by dumpprivkey) to your wallet." },
   { "keypoolrefill",          &keypoolrefill,          true,   false,     "keypoolrefill\nFills the keypool." },
@@ -282,6 +282,7 @@ static const CRPCCommand vRPCCommands[] =
   { "makekeypair",            &makekeypair,            false,  true,      "makekeypair [prefix]\nMake a public/private key pair.\n[prefix] is optional preferred prefix for the public key.\n" },
   { "move",                   &movecmd,                false,  false,     "move <fromaccount> <toaccount> <amount> [minconf=1] [comment]\nMove from one account in your wallet to another." },
   { "repairwallet",           &repairwallet,           false,  true,      "repairwallet\nRepair wallet if checkwallet reports any problem.\n" },
+  { "resendtransaction",      &resendtransaction,      false,  true,      "resendtransaction <txid>\nRebroadcasts a transaction to the network if not already in the chain.\n" },
   { "resendtx",               &resendtx,               false,  true,      "resendtx\nRe-send unconfirmed transactions.\n" },
   { "reservebalance",         &reservebalance,         false,  true,      "reservebalance [<reserve> [amount]]\n<reserve> is true or false to turn balance reserve on or off.\n<amount> is a real and rounded to cent.\nSet reserve amount not participating in network protection.\nIf no parameters provided current setting is printed.\n" },
   { "sendalert",              &sendalert,              false,  false,     "sendalert <message> <privatekey> <minver> <maxver> <priority> <id> [cancelupto]\n<message> is the alert text message\n<privatekey> is hex string of alert master private key\n<minver> is the minimum applicable internal client version\n<maxver> is the maximum applicable internal client version\n<priority> is integer priority number\n<id> is the alert id\n[cancelupto] cancels all alert id's up to this number\nReturns true or false." },
@@ -297,7 +298,7 @@ static const CRPCCommand vRPCCommands[] =
   { "signmessage",            &signmessage,            false,  false,     "signmessage <2GiveCoinaddress> <message>\nSign a message with the private key of an address" },
   { "signrawtransaction",     &signrawtransaction,     false,  false,     "signrawtransaction <hex string> [{\"txid\":txid,\"vout\":n,\"scriptPubKey\":hex},...] [<privatekey1>,...] [sighashtype=\"ALL\"]\nSign inputs for raw transaction (serialized, hex-encoded).\n" },
   { "stop",                   &stop,                   true,   true,      "stop <detach>\n<detach> is true or false to detach the database or not for this stop only\nStop 2GiveCoin server (and possibly override the detachdb config value)." },
-  { "submitblock",            &submitblock,            false,  false,     "submitblock <hex data> [optional-params-obj]\n[optional-params-obj] parameter is currently ignored.\nAttempts to submit new block to network.\nSee https://en.bitcoin.it/wiki/BIP_0022 for full specification." },
+//dvd  { "submitblock",            &submitblock,            false,  false,     "submitblock <hex data> [optional-params-obj]\n[optional-params-obj] parameter is currently ignored.\nAttempts to submit new block to network.\nSee https://en.bitcoin.it/wiki/BIP_0022 for full specification." },
   { "validateaddress",        &validateaddress,        true,   false,     "validateaddress <2GiveCoinaddress>\nReturn information about <2GiveCoinaddress>." },
   { "validatepubkey",         &validatepubkey,         true,   false,     "validatepubkey <2GiveCoinpubkey>\nReturn information about <2GiveCoinpubkey>." },
   { "verifymessage",          &verifymessage,          false,  false,     "verifymessage <2GiveCoinaddress> <signature> <message>\nVerify a signed message" },

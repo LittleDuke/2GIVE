@@ -9,6 +9,7 @@
 
 class OptionsModel;
 class AddressTableModel;
+class GiftCardTableModel;
 class TransactionTableModel;
 class CWallet;
 class CKeyID;
@@ -61,6 +62,7 @@ public:
 
     OptionsModel *getOptionsModel();
     AddressTableModel *getAddressTableModel();
+    GiftCardTableModel *getGiftCardTableModel();
     TransactionTableModel *getTransactionTableModel();
 
     qint64 getBalance() const;
@@ -136,6 +138,7 @@ private:
     OptionsModel *optionsModel;
 
     AddressTableModel *addressTableModel;
+    GiftCardTableModel  *giftCardTableModel;
     TransactionTableModel *transactionTableModel;
 
     // Cache some values to be able to detect changes

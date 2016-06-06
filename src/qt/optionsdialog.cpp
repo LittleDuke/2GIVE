@@ -28,6 +28,13 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 #ifndef USE_UPNP
     ui->mapPortUpnp->setEnabled(false);
 #endif
+//dvd
+    ui->minting->setEnabled(true);
+    ui->mining->setEnabled(true);
+
+    connect(ui->minting, SIGNAL(toggled(bool)), this, SLOT(on_applyButton_clicked()));
+    connect(ui->mining, SIGNAL(toggled(bool)), this, SLOT(on_applyButton_clicked()));
+
 
     ui->proxyIp->setEnabled(false);
     ui->proxyPort->setEnabled(false);
@@ -129,6 +136,8 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->transactionFee, OptionsModel::Fee);
     mapper->addMapping(ui->bitcoinAtStartup, OptionsModel::StartAtStartup);
     mapper->addMapping(ui->detachDatabases, OptionsModel::DetachDatabases);
+    mapper->addMapping(ui->minting, OptionsModel::MintingEnabled);
+    mapper->addMapping(ui->mining, OptionsModel::MiningEnabled);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
@@ -149,6 +158,8 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->displayAddresses, OptionsModel::DisplayAddresses);
 	mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
+
+
 }
 
 void OptionsDialog::enableApplyButton()

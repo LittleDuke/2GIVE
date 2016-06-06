@@ -134,7 +134,7 @@ void AddressBookPage::setModel(AddressTableModel *model)
     // Set column widths
 #if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->resizeSection(
-            AddressTableModel::Address, 320);
+            AddressTableModel::Address, 333);
     ui->tableView->horizontalHeader()->setResizeMode(
             AddressTableModel::Label, QHeaderView::Stretch);
 #else
@@ -175,14 +175,17 @@ void AddressBookPage::onEditAction()
     if(indexes.isEmpty())
         return;
 
+
     EditAddressDialog dlg(
             tab == SendingTab ?
             EditAddressDialog::EditSendingAddress :
             EditAddressDialog::EditReceivingAddress);
+
     dlg.setModel(model);
     QModelIndex origIndex = proxyModel->mapToSource(indexes.at(0));
     dlg.loadRow(origIndex.row());
     dlg.exec();
+
 }
 
 void AddressBookPage::on_signMessage_clicked()
@@ -220,9 +223,9 @@ void AddressBookPage::on_newAddressButton_clicked()
     if(!model)
         return;
     EditAddressDialog dlg(
-            tab == SendingTab ?
-            EditAddressDialog::NewSendingAddress :
-            EditAddressDialog::NewReceivingAddress, this);
+                tab == SendingTab ?
+                EditAddressDialog::NewSendingAddress :
+                EditAddressDialog::NewReceivingAddress );
     dlg.setModel(model);
     if(dlg.exec())
     {

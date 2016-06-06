@@ -8,6 +8,8 @@
 #include <QFont>
 #include <QColor>
 
+extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
+
 const QString AddressTableModel::Send = "S";
 const QString AddressTableModel::Receive = "R";
 
@@ -64,11 +66,13 @@ public:
                 const CBitcoinAddress& address = item.first;
                 const std::string& strName = item.second;
                 bool fMine = IsMine(*wallet, address.Get());
-                cachedAddressTable.append(AddressTableEntry(fMine ? AddressTableEntry::Receiving : AddressTableEntry::Sending,
+                if (!QString::fromStdString(address.ToString()).contains("Gift"))
+                    cachedAddressTable.append(AddressTableEntry(fMine ? AddressTableEntry::Receiving : AddressTableEntry::Sending,
                                   QString::fromStdString(strName),
                                   QString::fromStdString(address.ToString())));
             }
         }
+        qSort(cachedAddressTable.begin(), cachedAddressTable.end(), AddressTableEntryLessThan());
     }
 
     void updateEntry(const QString &address, const QString &label, bool isMine, int status)
@@ -232,7 +236,7 @@ bool AddressTableModel::setData(const QModelIndex & index, const QVariant & valu
                 return false;
             }
             // Double-check that we're not overwriting a receiving address
-            if(rec->type == AddressTableEntry::Sending)
+            if (rec->type == AddressTableEntry::Sending)
             {
                 {
                     LOCK(wallet->cs_wallet);
@@ -272,7 +276,7 @@ Qt::ItemFlags AddressTableModel::flags(const QModelIndex & index) const
     // Can edit address and label for sending addresses,
     // and only label for receiving addresses.
     if(rec->type == AddressTableEntry::Sending ||
-      (rec->type == AddressTableEntry::Receiving && index.column()==Label))
+      ((rec->type == AddressTableEntry::Receiving) && index.column()==Label))
     {
         retval |= Qt::ItemIsEditable;
     }
@@ -303,6 +307,9 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
 {
     std::string strLabel = label.toStdString();
     std::string strAddress = address.toStdString();
+
+    char    strPubKey[256],
+            strPrivKey[256];
 
     editStatus = OK;
 

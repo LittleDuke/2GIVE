@@ -33,7 +33,7 @@
        <item>
         <widget class="QLabel" name="transactionFeeInfoLabel">
          <property name="text">
-          <string>There is a mandatory 1% transaction fee to pay the nodes securing the network.  Anything else is considered generous.</string>
+          <string>There is a mandatory one percent (1%) transaction fee to pay the nodes securing the network.  Anything else is considered generous.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -93,6 +93,23 @@
          </property>
          <property name="text">
           <string>&amp;Detach databases at shutdown</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="minting">
+         <property name="text">
+          <string>&amp;Earn interest by staking eligible 2GIVE held in wallet (POS)</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mining">
+         <property name="text">
+          <string>&amp;Compete for block rewards by mining (POW)</string>
          </property>
         </widget>
        </item>
