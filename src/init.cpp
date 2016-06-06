@@ -789,6 +789,26 @@ bool AppInit2()
         if (!walletdb.WriteAccount("", account))
             printf("Unable to WriteAccount(\"\"\n");
 
+    } else {    // confirm we have a default set for pre RC4 wallets
+        CWalletDB walletdb(pwalletMain->strWalletFile);
+
+        CAccount account;
+        if (!walletdb.ReadAccount("", account)) {
+            printf("Unable to ReadAccount(\"\")\n");
+            printf("GetKeyFromPool(account.vchPubKey, true)\n");
+            if (!pwalletMain->GetKeyFromPool(account.vchPubKey, true))
+                strErrors << _("Cannot initialize keypool") << "\n";
+            pwalletMain->SetDefaultKey(account.vchPubKey);
+            printf("SetDefaultKey(account.vchPubKey) : %s\n", CBitcoinAddress(pwalletMain->vchDefaultKey.GetID()).ToString().c_str());
+
+            if (!pwalletMain->SetAddressBookName(account.vchPubKey.GetID(), "My Give* Address"))
+                strErrors << _("Cannot write default address") << "\n";
+            if (!walletdb.WriteAccount("", account))
+                printf("Unable to WriteAccount(\"\"\n");
+        } else {
+            printf("Default account \"\" is set to %s\n", CBitcoinAddress(pwalletMain->vchDefaultKey.GetID()).ToString().c_str());
+        }
+
     }
 
     printf("%s", strErrors.str().c_str());
