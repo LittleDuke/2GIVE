@@ -254,8 +254,8 @@ void GiftCardPage::on_newAddressButton_clicked()
                     filePath = fileInfo.absolutePath();
 
                     // launch browser to display/print
-                    QString url = "file://" + fileName;
-                    QDesktopServices::openUrl(QUrl(url));
+                    //QString url = "file://" + fileName;
+                    QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
                 }
             }
         }
