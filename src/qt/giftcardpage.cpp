@@ -266,7 +266,7 @@ void GiftCardPage::on_templateButton_clicked()
 {
     QMessageBox msgBox;
 
-    msgBox.setWindowTitle("Update Templates");
+    msgBox.setWindowTitle("Update Template");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
 
