@@ -17,6 +17,7 @@
 
 using namespace std;
 extern int nStakeMaxAge;
+extern bool fCoinFolding;
 extern CWallet* pwalletMain;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1389,9 +1390,15 @@ bool CWallet::SelectCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<
         return (nValueRet >= nTargetValue);
     }
 
-    return (SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 6, vCoins, setCoinsRet, nValueRet) ||
+    if (fCoinFolding) {
+        return (SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 6, vCoins, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 1, vCoins, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 0, 1, vCoins, setCoinsRet, nValueRet));
+    } else {
+        return (SelectCoinsMinConfOriginal(nTargetValue, nSpendTime, 1, 6, vCoins, setCoinsRet, nValueRet) ||
+                SelectCoinsMinConfOriginal(nTargetValue, nSpendTime, 1, 1, vCoins, setCoinsRet, nValueRet) ||
+                SelectCoinsMinConfOriginal(nTargetValue, nSpendTime, 0, 1, vCoins, setCoinsRet, nValueRet));
+    }
 }
 
 bool CWallet::SelectStakeCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet, const CCoinControl* coinControl) const

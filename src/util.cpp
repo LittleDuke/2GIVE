@@ -75,6 +75,7 @@ bool fShutdown = false;
 bool fDaemon = false;
 bool fServer = false;
 bool fPosMinting = true;
+bool fCoinFolding = true;
 // bool fPosMinting = false;
 bool fCommandLine = false;
 string strMiscWarning;

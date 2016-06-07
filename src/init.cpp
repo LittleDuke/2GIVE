@@ -294,6 +294,7 @@ std::string HelpMessage()
         "  -blockprioritysize=<n> "   + _("Set maximum size of high-priority/low-fee transactions in bytes (default: 27000)") + "\n" +
 //        "  -posmint=0             "   + _("Disable the PoS minting thread (default: 1)") + "\n" +
         "  -mint=0             "   + _("Disable the PoS minting thread (default: 1)") + "\n" +
+        "  -coinfold=0            "   + _("Disable the coin folding strategy in sends (default: 1)") + "\n" +
 
         "\n" + _("SSL options: (see the Bitcoin Wiki for SSL setup instructions)") + "\n" +
         "  -rpcssl                                  " + _("Use OpenSSL (https) for JSON-RPC connections") + "\n" +
@@ -392,6 +393,8 @@ bool AppInit2()
 //only one of these are necessary
 //dvd    fPosMinting = GetBoolArg("-posmint", true); // set pos minter threads on or off (default=on)
     fPosMinting = GetBoolArg("-mint", true); // set pos minter threads on or off (default=on)
+    fCoinFolding = GetBoolArg("-coinfold", true); // set pos minter threads on or off (default=on)
+    printf("CoinFolding = %d\n", fCoinFolding);
     fDebug = GetBoolArg("-debug");
     SoftSetBoolArg("-dnsseed", true);
 

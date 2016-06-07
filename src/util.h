@@ -152,6 +152,7 @@ extern bool fShutdown;
 extern bool fDaemon;
 extern bool fServer;
 extern bool fPosMinting;
+extern bool fCoinFolding;
 extern bool fCommandLine;
 extern std::string strMiscWarning;
 extern bool fTestNet;
