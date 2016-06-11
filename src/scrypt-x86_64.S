@@ -26,6 +26,12 @@
 	.section .note.GNU-stack,"",%progbits
 #endif
 
+#ifdef __APPLE__
+    #define CODE_ALIGN_SIZE 16
+#else
+    #define CODE_ALIGN_SIZE 32
+#endif
+
 #if defined(__x86_64__)
 
 #define scrypt_shuffle(src, so, dest, do) \
@@ -175,7 +181,7 @@
 
 
 	.text
-	.align 32
+    .align CODE_ALIGN_SIZE
 gen_salsa8_core:
 	# 0: %rdx, %rdi, %rcx, %rsi
 	movq	8(%rsp), %rdi
@@ -274,7 +280,7 @@ gen_salsa8_core:
 
 
 	.text
-	.align 32
+    .align CODE_ALIGN_SIZE
 	.globl scrypt_core
 	.globl _scrypt_core
 scrypt_core:
@@ -525,7 +531,7 @@ gen_scrypt_core_loop2:
 	xmm_salsa8_core_doubleround(); \
 
 
-	.align 32
+    .align CODE_ALIGN_SIZE
 xmm_scrypt_core:
 	# shuffle 1st block into %xmm8-%xmm11
 	movl	60(%rdi), %edx
@@ -837,7 +843,7 @@ xmm_scrypt_core_loop2:
 
 
 	.text
-	.align 32
+    .align CODE_ALIGN_SIZE
 	.globl scrypt_best_throughput
 	.globl _scrypt_best_throughput
 scrypt_best_throughput:
@@ -999,7 +1005,7 @@ scrypt_best_throughput_exit:
 
 
 	.text
-	.align 32
+    .align CODE_ALIGN_SIZE
 	.globl scrypt_core_2way
 	.globl _scrypt_core_2way
 scrypt_core_2way:
@@ -1461,7 +1467,7 @@ scrypt_core_2way_loop2:
 
 
 	.text
-	.align 32
+    .align CODE_ALIGN_SIZE
 	.globl scrypt_core_3way
 	.globl _scrypt_core_3way
 scrypt_core_3way:
