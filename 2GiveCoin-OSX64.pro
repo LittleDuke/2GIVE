@@ -20,6 +20,8 @@ BDB_INCLUDE_PATH=/usr/local/opt/berkeley-db4/include
 BDB_LIB_PATH=/usr/local/opt/berkeley-db4/lib
 OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
 OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
+QRENCODE_INCLUDE_PATH=/usr/local/opt/qrencode/include
+QRENCODE_LIB_PATH=/usr/local/opt/grencode/lib
 
 CONFIG += static
 
@@ -128,7 +130,7 @@ contains(BITCOIN_NEED_QT_PLUGINS, 1) {
 
 QMAKE_CXXFLAGS += -msse2
 QMAKE_CFLAGS += -msse2
-QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector -Wno-reserved-user-defined-literal
 
 # Input
 DEPENDPATH += src src/json src/qt
@@ -380,6 +382,10 @@ isEmpty(BOOST_INCLUDE_PATH) {
     macx:BOOST_INCLUDE_PATH = /opt/local/include
 }
 
+isEmpty(PCRE_INCLUDE_PATH) {
+    macx:PCRE_INCLUDE_PATH = /usr/local/opt/pcre/include
+}
+
 windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/bitcoin-qt.rc
 
@@ -408,9 +414,13 @@ macx:TARGET = "2GiveCoin-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
+macx:QMAKE_LFLAGS += -stdlib=libc++
+macx:QMAKE_CXXFLAGS += -stdlib=libc++
+macx:QRENCODE_LIB_PATH = /usr/local/opt/qrencode/lib
+macx:QRENCODE_INCLUDE_PATH = /usr/local/opt/qrencode/include
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
-INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
+INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH $$PCRE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
 LIBS += -lssl -lcrypto -lpcre -lcurl -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
