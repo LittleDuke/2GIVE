@@ -72,6 +72,8 @@
         <file alias="Gift">res/icons/2Give-Gift32.png</file>
         <file alias="Rewards16G">res/icons/2Give-Rewards16G.png</file>
         <file alias="Interest16G">res/icons/2Give-Interest16G.png</file>
+        <file alias="Piggy32">res/icons/2Give-Piggy32.png</file>
+        <file alias="Piggy20">res/icons/2Give-Piggy20.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

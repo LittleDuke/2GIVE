@@ -391,7 +391,7 @@ QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord *wtx
     case TransactionRecord::SendToOther:
         return QIcon(":/icons/Give20");
     default:
-        return QIcon(":/icons/tx_inout");
+        return QIcon(":/icons/Piggy20");
     }
     return QVariant();
 }
