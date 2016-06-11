@@ -6,7 +6,7 @@
 # Mac OS X makefile for bitcoin
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CXX=llvm-g++
+CXX=g++
 DEPSDIR=/usr/local
 DB4DIR=/usr/local/opt/berkeley-db4
 OPENSSLDIR=/usr/local/opt/openssl
