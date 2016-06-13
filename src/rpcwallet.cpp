@@ -19,6 +19,8 @@ static CCriticalSection cs_nWalletUnlockTime;
 
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, json_spirit::Object& entry);
 
+extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
+
 std::string HelpRequiringPassphrase()
 {
     return pwalletMain->IsCrypted()
@@ -59,6 +61,12 @@ string AccountFromValue(const Value& value)
     if (strAccount == "*")
         throw JSONRPCError(RPC_WALLET_INVALID_ACCOUNT_NAME, "Invalid account name");
     return strAccount;
+}
+
+string PrefixFromValue(const Value& value)
+{
+    string strPrefix = value.get_str();
+    return strPrefix;
 }
 
 Value getinfo(const Array& params, bool fHelp)
@@ -109,8 +117,9 @@ Value getnewpubkey(const Array& params, bool fHelp)
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
 
+    string strPrefix = "G";
     if (!pwalletMain->IsLocked())
-        pwalletMain->TopUpKeyPool();
+        pwalletMain->TopUpKeyPool(strPrefix);
 
     // Generate a new key that is added to wallet
     CPubKey newKey;
@@ -127,7 +136,7 @@ Value getnewpubkey(const Array& params, bool fHelp)
 
 Value getnewaddress(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         return Value();
 /*dvd        throw runtime_error(
             "getnewaddress [account] [prefix]\n"
@@ -140,13 +149,19 @@ Value getnewaddress(const Array& params, bool fHelp)
     string strAccount;
     if (params.size() > 0)
         strAccount = AccountFromValue(params[0]);
-/* dvd tbd
+    else
+        strAccount = "";
+
     string strPrefix;
     if (params.size() > 1)
-        strPrefix = AccountFromValue(params[1]);
-*/
+        strPrefix = PrefixFromValue(params[1]);
+    else
+        strPrefix = "G";
+
+    printf("strPrefix = %s\n", strPrefix.c_str());
+
     if (!pwalletMain->IsLocked())
-        pwalletMain->TopUpKeyPool();
+        pwalletMain->TopUpKeyPool(strPrefix);
 
     // Generate a new key that is added to wallet
     CPubKey newKey;
@@ -158,6 +173,8 @@ Value getnewaddress(const Array& params, bool fHelp)
 
     return CBitcoinAddress(keyID).ToString();
 }
+
+
 
 
 CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
@@ -1424,7 +1441,7 @@ Value keypoolrefill(const Array& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    pwalletMain->TopUpKeyPool();
+    pwalletMain->TopUpKeyPool("G");
 
     if (pwalletMain->GetKeyPoolSize() < GetArg("-keypool", 100))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error refreshing keypool.");
@@ -1438,7 +1455,7 @@ void ThreadTopUpKeyPool(void* parg)
     // Make this thread recognisable as the key-topping-up thread
     RenameThread("bitcoin-key-top");
 
-    pwalletMain->TopUpKeyPool();
+    pwalletMain->TopUpKeyPool("G");
 }
 
 void Thread2GiveCoinWalletPassphrase(void* parg)

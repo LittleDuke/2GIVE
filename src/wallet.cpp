@@ -19,6 +19,8 @@ using namespace std;
 extern int nStakeMaxAge;
 extern bool fCoinFolding;
 extern CWallet* pwalletMain;
+extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -62,18 +64,33 @@ CPubKey CWallet::GenerateCustomKey(const char *prefix)
     return key.GetPubKey();
 }
 
-CPubKey CWallet::GenerateNewKey(const char *prefix)
+CPubKey CWallet::GenerateNewKey(char *prefix)
 {
+    char    strPubKey[256],
+            strPrivKey[256];
+
     bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
 
     RandAddSeedPerfmon();
     CKey key;
     CPubKey pubKey;
     CKeyID  pubKeyID;
+    CBitcoinSecret vchSecret;
 
 // dvd
     printf("Generating an address with prefix %s\n", prefix);
+    if (VanityGen(39, prefix, strPubKey, strPrivKey)) {
+        printf("There was an error generating a key with that prefix\n");
+        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+    }
 
+
+    vchSecret.SetString(string(strPrivKey));
+
+    CSecret secret = vchSecret.GetSecret(fCompressed);
+    key.SetSecret(secret, fCompressed);
+    pubKeyID = key.GetPubKey().GetID();
+/*
     do {
         key.MakeNewKey(fCompressed);
 
@@ -84,7 +101,7 @@ CPubKey CWallet::GenerateNewKey(const char *prefix)
         pubKey = key.GetPubKey();
         pubKeyID = pubKey.GetID();
     } while (strncmp(prefix, CBitcoinAddress(pubKeyID).ToString().c_str(), strlen(prefix)));
-
+*/
     printf("wallet.cpp: GenerateNewKey() ==> %s\n", CBitcoinAddress(pubKeyID).ToString().c_str());
 
     if (!AddKey(key))
@@ -2101,6 +2118,10 @@ bool GetWalletFile(CWallet* pwallet, string &strWalletFileOut)
 //
 bool CWallet::NewKeyPool()
 {
+    char cPrefix[256];
+
+    strcpy(cPrefix, "Give");
+
     {
         LOCK(cs_wallet);
         CWalletDB walletdb(strWalletFile);
@@ -2111,15 +2132,19 @@ bool CWallet::NewKeyPool()
         if (IsLocked())
             return false;
 // dvd keypool size default = 1
-        walletdb.WritePool(1, CKeyPool(GenerateNewKey("Give")));
+        walletdb.WritePool(1, CKeyPool(GenerateNewKey(cPrefix)));
         setKeyPool.insert(1);
         printf("CWallet::NewKeyPool wrote one new key\n");
     }
     return true;
 }
 
-bool CWallet::TopUpKeyPool()
+bool CWallet::TopUpKeyPool(std::string prefix)
 {
+    char    cPrefix[256];
+
+    strcpy(cPrefix, prefix.c_str());
+
     {
         LOCK(cs_wallet);
 
@@ -2138,12 +2163,10 @@ bool CWallet::TopUpKeyPool()
 
             printf("keypool height %"PRI64d"\n", nEnd);
             if (pwalletMain->mapAddressBook.size() == 0) {
-                if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey("Give"))))
-                    throw runtime_error("TopUpKeyPool() : writing generated key failed");
-            } else {
-                if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey("G"))))
-                    throw runtime_error("TopUpKeyPool() : writing generated key failed");
+                strcpy(cPrefix, "Give");
             }
+            if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey(cPrefix))))
+                throw runtime_error("TopUpKeyPool() : writing generated key failed");
             setKeyPool.insert(nEnd);
             printf("keypool added key %"PRI64d", size=%"PRIszu"\n", nEnd, setKeyPool.size());
         }
@@ -2162,7 +2185,7 @@ void CWallet::ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool)
 
         if (!IsLocked())
             if (pwalletMain->mapAddressBook.size() == 0)
-                TopUpKeyPool();
+                TopUpKeyPool("G");
 
         // Get the oldest key
         if (setKeyPool.empty())
@@ -2229,6 +2252,8 @@ void CWallet::ReturnKey(int64 nIndex)
 bool CWallet::GetKeyFromPool(CPubKey& result, bool fAllowReuse)
 {
     int64 nIndex = 0;
+    char    cPrefix[] = "G";
+
     CKeyPool keypool;
     {
         LOCK(cs_wallet);
@@ -2246,7 +2271,7 @@ bool CWallet::GetKeyFromPool(CPubKey& result, bool fAllowReuse)
             if (IsLocked()) return false;
 
             printf("! GenerateNewKey(\"G\")\n");
-            result = GenerateNewKey("G");
+            result = GenerateNewKey(cPrefix);
             return true;
         }
         KeepKey(nIndex);
