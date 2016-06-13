@@ -132,7 +132,8 @@ OBJS= \
     obj/pbkdf2.o \
     obj/scrypt_mine.o \
     obj/scrypt-x86.o \
-    obj/scrypt-x86_64.o
+    obj/scrypt-x86_64.o \
+    obj/vanitygen.o
 
 ifdef USE_SSE2
 DEFS += -DUSE_SSE2
