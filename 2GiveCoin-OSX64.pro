@@ -21,7 +21,9 @@ BDB_LIB_PATH=/usr/local/opt/berkeley-db4/lib
 OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
 OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
 QRENCODE_INCLUDE_PATH=/usr/local/opt/qrencode/include
-QRENCODE_LIB_PATH=/usr/local/opt/grencode/lib
+QRENCODE_LIB_PATH=/usr/local/opt/qrencode/lib
+MINIUPNPC_INCLUDE_PATH=/usr/local/opt/miniupnpc/include
+MINIUPNPC_LIB_PATH=/usr/local/opt/miniupnpc/lib
 
 CONFIG += static
 
