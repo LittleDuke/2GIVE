@@ -108,7 +108,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
                 "QComboBox::drop-down  { subcontrol-origin: padding; subcontrol-position: top right; width: 15px; border-left-width: 1px; border-left-color: darkgray; border-left-style: solid;  border-top-right-radius: 3px;  border-bottom-right-radius: 3px; } " \
                 "QComboBox::down-arrow1  { image: url(:/icons/1downarrow.png); } " \
                 "QComboBox::down-arrow:on  { top: 1px; left: 1px; }" \
-                "QLineEdit { border: 1px solid #cccccc; border-radius: 4px; padding: 0px 4px; background: white; selection-background-color: #333333; color: 333333; margin: 6px; }" \
+                "QLineEdit { border: 1px solid #cccccc; border-radius: 4px; padding: 0px 4px; background: white; selection-background-color: #00ccff; color: black; margin: 6px; }" \
                 "QLabel { color: #404041; font-family:Open Sans; } " \
                 "QTableView { selection-background-color: #00ccff; background-color: #c7c8ca; border-color: #e8e8e8; margin: 6px; } " \
                 "QTableView1 QHeaderView { } " \
@@ -182,7 +182,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
 
-    giftCoinsPage = new GiftCardPage(GiftCardPage::ForEditing, GiftCardPage::GiftingTab);
+    giftCoinsPage = new GiftCardPage(GiftCardPage::ForEditing, GiftCardPage::GiftingTab, this);
 
     sendCoinsPage = new SendCoinsDialog(this);
 
@@ -918,6 +918,23 @@ void BitcoinGUI::gotoSendCoinsCharityPage()
     //SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(sendCoinsPage->entries->itemAt(i)->widget());
     SendCoinsRecipient rv;
     rv.address = (fTestNet?CHARITY_ADDRESS_TESTNET:CHARITY_ADDRESS);
+    rv.amount = CHARITY_DEFAULT_AMOUNT;
+
+    sendCoinsPage->pasteEntry(rv, true);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoSendCoinsGiftPage(QString addr, QString label)
+{
+    sendCoinsAction->setChecked(true);
+    centralWidget->setCurrentWidget(sendCoinsPage);
+    //charitySendAction->setEnabled(false);
+    //SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(sendCoinsPage->entries->itemAt(i)->widget());
+    SendCoinsRecipient rv;
+    rv.address = addr;
+    rv.label = label;
     rv.amount = CHARITY_DEFAULT_AMOUNT;
 
     sendCoinsPage->pasteEntry(rv, true);

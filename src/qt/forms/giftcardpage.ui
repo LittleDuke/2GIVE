@@ -33,7 +33,7 @@
       <enum>Qt::CustomContextMenu</enum>
      </property>
      <property name="toolTip">
-      <string>Double-click to edit address or label</string>
+      <string>Right-click for options</string>
      </property>
      <property name="tabKeyNavigation">
       <bool>false</bool>
@@ -63,7 +63,7 @@
         <string>Create a new address</string>
        </property>
        <property name="text">
-        <string>Generate Gift*</string>
+        <string>Generate New Gift*</string>
        </property>
        <property name="icon">
         <iconset resource="../bitcoin.qrc">
@@ -75,9 +75,30 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="templateButton">
+      <widget class="QToolButton" name="fundButton">
        <property name="text">
-        <string>Update Template</string>
+        <string>Fund Gift*</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="viewButton">
+       <property name="text">
+        <string>View in browser</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="regenerateButton">
+       <property name="text">
+        <string>Regenerate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="editButton">
+       <property name="text">
+        <string>Edit Label</string>
        </property>
       </widget>
      </item>
@@ -99,60 +120,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="showQRCode">
-       <property name="text">
-        <string>Show &amp;QR Code</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/qrcode</normaloff>:/icons/qrcode</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextOnly</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="signMessage">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Sign a message to prove you own a 2GiveCoin address</string>
-       </property>
-       <property name="text">
-        <string>Sign &amp;Message</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextOnly</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="verifyMessage">
-       <property name="toolTip">
-        <string>Verify a message to ensure it was signed with a specified 2GiveCoin address</string>
-       </property>
-       <property name="text">
-        <string>&amp;Verify Message</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/transaction_0</normaloff>:/icons/transaction_0</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextOnly</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="deleteButton">
        <property name="toolTip">
         <string>Delete the currently selected address from the list</string>
@@ -166,6 +133,13 @@
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextOnly</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="templateButton">
+       <property name="text">
+        <string>Update Template</string>
        </property>
       </widget>
      </item>

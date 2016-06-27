@@ -36,6 +36,7 @@ public:
     void accept();
 
     QString getAddress() const;
+    QString getLabel() const;
     void setAddress(const QString &address);
 private:
     bool saveCurrentRow();
@@ -46,6 +47,7 @@ private:
     GiftCardTableModel *model;
 
     QString address;
+    QString label;
 };
 
 #endif // CreateGiftDialog_H

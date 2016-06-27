@@ -17,6 +17,7 @@
 
 extern const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
 
+
 PaperWallet::PaperWallet(const QString &filename, const QString &addr, const QString &key, const QString &value) :
     fileName(filename),
     address(addr),
@@ -36,11 +37,12 @@ PaperWallet::~PaperWallet()
 
 bool PaperWallet::setTemplate(const QString &filename)
 {
-    QString  fqnTemplate;
+    QString fqnTemplate;
+
 
     boost::filesystem::path pathSrc = GetDataDir() / "templates";
 
-//    printf("pathSrc : %s\n", pathSrc.c_str());
+    //    printf("pathSrc : %s\n", pathSrc.c_str());
 
     if (boost::filesystem::is_directory(pathSrc))
         fqnTemplate = QString::fromStdString(pathSrc.string()) + QDir::separator() + filename;

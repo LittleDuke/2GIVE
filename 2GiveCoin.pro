@@ -58,6 +58,9 @@ QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 # for extra security on Windows: enable ASLR and DEP via GCC linker flags
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 
+# Gift*card support
+QT += sql
+
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
 contains(USE_QRCODE, -) {
@@ -214,7 +217,8 @@ HEADERS += src/qt/bitcoingui.h \
 #    src/qt/banner.h \
     src/qt/coincontroltreewidget.h \
     src/qt/coincontroldialog.h \
-    src/qt/stylesheeteditor.h
+    src/qt/stylesheeteditor.h \
+    src/qt/giftcarddatamanager.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -288,7 +292,8 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/vanitygen.cpp \
     src/qt/coincontroltreewidget.cpp \
     src/qt/coincontroldialog.cpp \
-    src/qt/stylesheeteditor.cpp
+    src/qt/stylesheeteditor.cpp \
+    src/qt/giftcarddatamanager.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc \

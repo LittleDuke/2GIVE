@@ -155,6 +155,9 @@ public slots:
     void askFee(qint64 nFeeRequired, bool *payFee);
     void handleURI(QString strURI);
 
+    void gotoSendCoinsGiftPage(QString addr = "", QString label = "");
+
+
 private slots:
     /** Launch Desktop Browser */
     void gotoGiveInfo();
@@ -173,6 +176,7 @@ private slots:
     void gotoSendCoinsCharityPage();
     /** Switch to gift coins page */
     void gotoGiftCoinsPage();
+
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");

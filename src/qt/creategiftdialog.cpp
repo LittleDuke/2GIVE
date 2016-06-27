@@ -61,11 +61,13 @@ bool CreateGiftDialog::saveCurrentRow()
         address = model->addRow(GiftCardTableModel::Gift,
                 ui->labelEdit->text(),
                 ui->addressEdit->text());
+        label = ui->labelEdit->text();
         break;
     case EditGiftAddress:
         if(mapper->submit())
         {
             address = ui->addressEdit->text();
+            label = ui->labelEdit->text();
         }
         break;
     }
@@ -115,6 +117,10 @@ QString CreateGiftDialog::getAddress() const
     return address;
 }
 
+QString CreateGiftDialog::getLabel() const
+{
+    return label;
+}
 void CreateGiftDialog::setAddress(const QString &address)
 {
     this->address = address;

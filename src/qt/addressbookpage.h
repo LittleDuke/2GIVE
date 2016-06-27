@@ -58,6 +58,8 @@ private:
     QString newAddressToSelect;
 
 private slots:
+    void on_giveButton_clicked();
+
     void on_deleteButton_clicked();
     void on_newAddressButton_clicked();
     /** Copy address of currently selected address entry to clipboard */

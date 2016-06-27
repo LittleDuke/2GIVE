@@ -75,6 +75,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="giveButton">
+       <property name="text">
+        <string>Give</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="copyToClipboard">
        <property name="toolTip">
         <string>Copy the currently selected address to the system clipboard</string>

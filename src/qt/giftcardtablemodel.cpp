@@ -274,7 +274,7 @@ Qt::ItemFlags GiftCardTableModel::flags(const QModelIndex & index) const
     // and only label for receiving addresses.
     if ((rec->type == GiftCardTableEntry::Gift) && (index.column()==Label))
     {
-        retval |= Qt::ItemIsEditable;
+//        retval |= Qt::ItemIsEditable;
     }
     return retval;
 }

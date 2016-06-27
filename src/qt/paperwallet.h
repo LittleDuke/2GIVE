@@ -7,7 +7,6 @@
 #include <QDialog>
 #include <QImage>
 
-
 class PaperWallet
 {
 public:
@@ -31,7 +30,6 @@ private:
     QString amount;
     QImage  publicImage;
     QImage  privateImage;
-
 };
 
 #endif // PAPERWALLET_H

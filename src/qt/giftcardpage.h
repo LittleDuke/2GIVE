@@ -4,6 +4,8 @@
 #ifndef GIFTCARDPAGE_H
 #define GIFTCARDPAGE_H
 
+#include "giftcarddatamanager.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -11,6 +13,7 @@ namespace Ui {
 }
 class GiftCardTableModel;
 class OptionsModel;
+class GiftCardDataManager;
 
 QT_BEGIN_NAMESPACE
 class QTableView;
@@ -41,6 +44,7 @@ public:
     explicit GiftCardPage(Mode mode, Tabs tab, QWidget *parent = 0);
     ~GiftCardPage();
 
+    void viewGiftCard(const QString &fileName);
     void setModel(GiftCardTableModel *model);
     void setOptionsModel(OptionsModel *optionsModel);
     const QString &getReturnValue() const { return returnValue; }
@@ -61,19 +65,22 @@ private:
     QAction *deleteAction;
     QString newAddressToSelect;
     QString filePath;
+    GiftCardDataManager gcdb;
 
 private slots:
     void on_newAddressButton_clicked();
     void on_templateButton_clicked();
+    void on_editButton_clicked();
+    void on_fundButton_clicked();
+    void on_viewButton_clicked();
+    void on_regenerateButton_clicked();
+
 
     void on_deleteButton_clicked();
 
     /** Copy address of currently selected address entry to clipboard */
     void on_copyToClipboard_clicked();
-    void on_signMessage_clicked();
-    void on_verifyMessage_clicked();
     void selectionChanged();
-    void on_showQRCode_clicked();
     /** Spawn contextual menu (right mouse menu) for address book entry */
     void contextualMenu(const QPoint &point);
 
@@ -84,10 +91,6 @@ private slots:
 
     /** New entry/entries were added to address table */
     void selectNewAddress(const QModelIndex &parent, int begin, int end);
-
-signals:
-    void signMessage(QString addr);
-    void verifyMessage(QString addr);
 };
 
-#endif // ADDRESSBOOKDIALOG_H
+#endif // GIFTCARDPAGE_H
