@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="labelExplanation">
      <property name="text">
-      <string>These are the 2GiveCoin Gift* addresses you've generated.</string>
+      <string>These are the available Gift*Cards you've generated.</string>
      </property>
      <property name="textFormat">
       <enum>Qt::PlainText</enum>
@@ -85,6 +85,13 @@
       <widget class="QToolButton" name="viewButton">
        <property name="text">
         <string>View in browser</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="balanceButton">
+       <property name="text">
+        <string>Update Balances</string>
        </property>
       </widget>
      </item>

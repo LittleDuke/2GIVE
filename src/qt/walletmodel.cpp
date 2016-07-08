@@ -21,8 +21,14 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     cachedEncryptionStatus(Unencrypted),
     cachedNumBlocks(0)
 {
+    // Connect to SQLite database
+    boost::filesystem::path gdbName = GetDataDir() / "wallet.sqlite3";
+    QString fqnDatabase = QString::fromStdString(gdbName.string());
+
+    gcdb = GiftCardDataManager(fqnDatabase);
+
     addressTableModel = new AddressTableModel(wallet, this);
-    giftCardTableModel = new GiftCardTableModel(wallet, this);
+    giftCardTableModel = new GiftCardTableModel(gcdb, this);
     transactionTableModel = new TransactionTableModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
@@ -31,6 +37,8 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     pollTimer->start(MODEL_UPDATE_DELAY);
 
     subscribeToCoreSignals();
+
+
 }
 
 WalletModel::~WalletModel()
@@ -122,7 +130,7 @@ void WalletModel::updateTransaction(const QString &hash, int status)
 void WalletModel::updateAddressBook(const QString &address, const QString &label, bool isMine, int status)
 {
     if ((giftCardTableModel) && (address.contains("Gift")))
-        giftCardTableModel->updateEntry(address, label, isMine, status);
+        giftCardTableModel->updateEntry(address, label, QString(""), 0.0, status);
     else
         if (addressTableModel)
             addressTableModel->updateEntry(address, label, isMine, status);
@@ -477,3 +485,9 @@ void WalletModel::UnlockContext::CopyFrom(const UnlockContext& rhs)
  {
      return;
  }
+
+ GiftCardDataManager WalletModel::giftCardDataBase(void)
+ {
+     return gcdb;
+ }
+

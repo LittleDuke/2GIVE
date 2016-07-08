@@ -4,8 +4,11 @@
 #include <QAbstractTableModel>
 #include <QStringList>
 
+#include "giftcarddatamanager.h"
+
+
 class GiftCardTablePriv;
-class CWallet;
+//class CWallet;
 class WalletModel;
 
 /**
@@ -14,13 +17,15 @@ class WalletModel;
 class GiftCardTableModel : public QAbstractTableModel
 {
     Q_OBJECT
-public:
-    explicit GiftCardTableModel(CWallet *wallet, WalletModel *parent = 0);
+public:    
+    explicit GiftCardTableModel(GiftCardDataManager gcdb, WalletModel *parent = 0);
     ~GiftCardTableModel();
 
     enum ColumnIndex {
         Label = 0,      // User specified label
-        Address = 1    // 2GIVE address
+        Address = 1,    // 2GIVE address
+        Generated = 2,  // date generated / regenerated
+        Balance = 3
     };
 
     enum RoleIndex {
@@ -66,9 +71,11 @@ public:
 
     EditStatus getEditStatus() const { return editStatus; }
 
+    GiftCardDataManager giftCardDataBase(void);
+
 private:
     WalletModel *walletModel;
-    CWallet *wallet;
+    GiftCardDataManager gcdb;
     GiftCardTablePriv *priv;
     QStringList columns;
     EditStatus editStatus;
@@ -82,7 +89,8 @@ signals:
 public slots:
     /* Update address list from core.
      */
-    void updateEntry(const QString &address, const QString &label, bool isMine, int status);
+    void updateEntry(const QString &address, const QString &label, const QString &generate, const float balance, int status);
+    void refreshAddressTable(void);
 
     friend class GiftCardTablePriv;
 };

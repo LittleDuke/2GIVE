@@ -12,6 +12,7 @@
 #include "guiutil.h"
 #include "paperwallet.h"
 #include "giftcarddatamanager.h"
+#include "ui_interface.h"
 
 #include <QSortFilterProxyModel>
 #include <QClipboard>
@@ -74,6 +75,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     QAction *copyAddressAction = new QAction(ui->copyToClipboard->text(), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
     QAction *viewAction = new QAction(tr("View in browser"), this);
+    QAction *balanceAction = new QAction(tr("Update Balance"), this);
     QAction *regenerateAction = new QAction(tr("Regenerate"), this);
     deleteAction = new QAction(ui->deleteButton->text(), this);
 
@@ -86,6 +88,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
     contextMenu->addAction(viewAction);
+    contextMenu->addAction(balanceAction);
     contextMenu->addAction(regenerateAction);
 
     // Connect signals for context menu actions
@@ -97,6 +100,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(editAction, SIGNAL(triggered()), this, SLOT(onEditAction()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(on_deleteButton_clicked()));
     connect(viewAction, SIGNAL(triggered()), this, SLOT(on_viewButton_clicked()));
+    connect(balanceAction, SIGNAL(triggered()), this, SLOT(on_balanceButton_clicked()));
     connect(regenerateAction, SIGNAL(triggered()), this, SLOT(on_regenerateButton_clicked()));
 
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
@@ -109,10 +113,11 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     printf("homePath = %s\n", filePath.toStdString().c_str());
 
     // Connect to SQLite database
-    boost::filesystem::path gdbName = GetDataDir() / "giftcards.sqlite3";
-    QString fqnDatabase = QString::fromStdString(gdbName.string());
+//    boost::filesystem::path gdbName = GetDataDir() / "giftcards.sqlite3";
+//    QString fqnDatabase = QString::fromStdString(gdbName.string());
 
-    gcdb = GiftCardDataManager(fqnDatabase);
+//    gcdb = GiftCardDataManager(fqnDatabase);
+
 }
 
 GiftCardPage::~GiftCardPage()
@@ -151,6 +156,7 @@ void GiftCardPage::setModel(GiftCardTableModel *model)
 
     ui->tableView->setModel(proxyModel);
     ui->tableView->sortByColumn(0, Qt::AscendingOrder);
+    ui->tableView->resizeColumnsToContents();
 
     // Set column widths
 #if QT_VERSION < 0x050000
@@ -190,6 +196,8 @@ void GiftCardPage::onCopyLabelAction()
 
 void GiftCardPage::onEditAction()
 {
+    gcdb = model->giftCardDataBase();
+
     if(!ui->tableView->selectionModel())
         return;
     QModelIndexList indexes = ui->tableView->selectionModel()->selectedRows();
@@ -218,7 +226,10 @@ void GiftCardPage::on_editButton_clicked()
 void GiftCardPage::on_fundButton_clicked()
 {
     QTableView *table = ui->tableView;
-    QString privKey, label, fileName;
+    GiftCardDataEntry   card;
+
+    gcdb = model->giftCardDataBase();
+
 
     if (!table->selectionModel())
         return;
@@ -228,11 +239,11 @@ void GiftCardPage::on_fundButton_clicked()
     {
         QString pubKey = indexes.at(0).data().toString();
 
-        gcdb.readCard(pubKey, privKey, label, fileName);
+        gcdb.readCard(pubKey, card);
 
         QMetaObject::invokeMethod(this->parent()->parent(), "gotoSendCoinsGiftPage", GUIUtil::blockingGUIThreadConnection(),
                                   Q_ARG(QString, pubKey),
-                                  Q_ARG(QString, label));
+                                  Q_ARG(QString, card.label));
     }
 }
 
@@ -240,6 +251,8 @@ void GiftCardPage::on_newAddressButton_clicked()
 {
     char    strPubKey[256],
             strPrivKey[256];
+
+    gcdb = model->giftCardDataBase();
 
     if(!model)
         return;
@@ -256,11 +269,11 @@ void GiftCardPage::on_newAddressButton_clicked()
 
         strcpy(strPubKey, giftKeys.at(0).toStdString().c_str());
         strcpy(strPrivKey, giftKeys.at(1).toStdString().c_str());
-        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
+//        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
 
         QString defaultFileName = filePath + QDir::separator() + giftKeys.at(0) + ".html";
 
-        printf("defaultFileName = %s\n", defaultFileName.toStdString().c_str());
+//        printf("defaultFileName = %s\n", defaultFileName.toStdString().c_str());
 
         QString fileName = GUIUtil::getSaveFileName(
                     this, tr("Save Gift* Card"), defaultFileName, tr("Cards (*.html)"));
@@ -268,7 +281,7 @@ void GiftCardPage::on_newAddressButton_clicked()
         if (!fileName.isNull()) {
             PaperWallet pWallet = PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
             if (pWallet.genWallet()) {
-                gcdb.addCard(giftKeys.at(0), giftKeys.at(1), fileName, label);
+                gcdb.updateCard(giftKeys.at(0), label, fileName);
                 viewGiftCard(fileName);
             }
         }
@@ -280,9 +293,12 @@ void GiftCardPage::on_newAddressButton_clicked()
 void GiftCardPage::on_regenerateButton_clicked()
 {
     QTableView *table = ui->tableView;
-    QString privKey, label, defaultFileName;
+    GiftCardDataEntry   card;
+//    QString privKey, label, defaultFileName;
     char    strPubKey[256],
             strPrivKey[256];
+
+    gcdb = model->giftCardDataBase();
 
 //    printf("GiftCardPage::on_regenerateButton()\n");
 
@@ -294,18 +310,24 @@ void GiftCardPage::on_regenerateButton_clicked()
     {
         QString pubKey = indexes.at(0).data().toString();
 
-        gcdb.readCard(pubKey, privKey, label, defaultFileName);
+        gcdb.readCard(pubKey, card);
 
         strcpy(strPubKey, pubKey.toStdString().c_str());
-        strcpy(strPrivKey,privKey.toStdString().c_str());
+        strcpy(strPrivKey, card.privkey.toStdString().c_str());
 //        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
+        if (card.filename == "") {
+            QString defaultFileName = filePath + QDir::separator() + card.pubkey + ".html";
+            card.filename = defaultFileName;
+        }
 
         QString fileName = GUIUtil::getSaveFileName(
-                    this, tr("Save Gift* Card"), defaultFileName, tr("Cards (*.html)"));
+                    this, tr("Save Gift* Card"), card.filename, tr("Cards (*.html)"));
 
         if (!fileName.isNull()) {
-            PaperWallet pWallet = PaperWallet(fileName, pubKey, privKey, "");
+            PaperWallet pWallet = PaperWallet(fileName, pubKey, card.privkey, "");
             if (pWallet.genWallet()) {
+                gcdb.updateCard(card.pubkey, card.label, fileName);
+                model->updateEntry(card.pubkey, card.label, card.generated, card.balance, CT_UPDATED);
                 viewGiftCard(fileName);
             }
         }
@@ -315,7 +337,10 @@ void GiftCardPage::on_regenerateButton_clicked()
 void GiftCardPage::on_viewButton_clicked()
 {
     QTableView *table = ui->tableView;
-    QString privKey, label, fileName;
+    GiftCardDataEntry   card;
+//    QString privKey, label, fileName;
+
+    gcdb = model->giftCardDataBase();
 
     if (!table->selectionModel())
         return;
@@ -325,12 +350,41 @@ void GiftCardPage::on_viewButton_clicked()
     {
         QString pubKey = indexes.at(0).data().toString();
 
-        gcdb.readCard(pubKey, privKey, label, fileName);
+        gcdb.readCard(pubKey, card);
 
-        if (!fileName.isNull()) {
-              viewGiftCard(fileName);
+        if (!card.filename.isNull()) {
+              viewGiftCard(card.filename);
         }
     }
+}
+
+void GiftCardPage::on_balanceButton_clicked()
+{
+    float   balance = 0.0;
+    QTableView *table = ui->tableView;
+    GiftCardDataEntry   card;
+
+    gcdb = model->giftCardDataBase();
+
+    if (!table->selectionModel())
+        return;
+
+    gcdb.updateBalances();
+    model->refreshAddressTable();
+
+    return;
+
+    QModelIndexList indexes = table->selectionModel()->selectedRows(1);
+    if(!indexes.isEmpty())
+    {
+        QString pubKey = indexes.at(0).data().toString();
+
+        balance = gcdb.getBalance(pubKey);
+        gcdb.readCard(pubKey, card);
+        gcdb.updateCard(card.pubkey, card.label);
+        model->updateEntry(card.pubkey, card.label, card.generated, balance, CT_UPDATED);
+    }
+    model->refreshAddressTable();
 }
 
 void GiftCardPage::on_templateButton_clicked()
@@ -355,6 +409,9 @@ void GiftCardPage::on_templateButton_clicked()
 void GiftCardPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;
+
+    gcdb = model->giftCardDataBase();
+
     if(!table->selectionModel())
         return;
     QModelIndexList indexes = table->selectionModel()->selectedRows(1);

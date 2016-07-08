@@ -1,11 +1,11 @@
 // Copyright 2016 Strength in Numbers Foundation
 
-
+#include "giftcarddatamanager.h"
 #include "giftcardtablemodel.h"
 #include "guiutil.h"
 #include "walletmodel.h"
+#include "ui_interface.h"
 
-#include "wallet.h"
 #include "base58.h"
 
 #include <QFont>
@@ -27,10 +27,12 @@ struct GiftCardTableEntry
     QString label;
     QString address;
     QString privkey;
+    QString generated;
+    float   balance;
 
     GiftCardTableEntry() {}
-    GiftCardTableEntry(Type type, const QString &label, const QString &address):
-        type(type), label(label), address(address) {}
+    GiftCardTableEntry(Type type, const QString &label, const QString &address, const QString &generated, const float balance):
+        type(type), label(label), address(address), generated(generated), balance(balance) {}
 };
 
 struct GiftCardTableEntryLessThan
@@ -53,34 +55,33 @@ struct GiftCardTableEntryLessThan
 class GiftCardTablePriv
 {
 public:
-    CWallet *wallet;
+    GiftCardDataManager gcdb;
     QList<GiftCardTableEntry> cachedGiftCardTable;
     GiftCardTableModel *parent;
 
-    GiftCardTablePriv(CWallet *wallet, GiftCardTableModel *parent):
-        wallet(wallet), parent(parent) {}
+    GiftCardTablePriv(GiftCardDataManager gcdb, GiftCardTableModel *parent):
+        gcdb(gcdb), parent(parent) {}
 
     void refreshAddressTable()
     {
+        QList<GiftCardDataEntry> cards;
+
         cachedGiftCardTable.clear();
-        {
-            LOCK(wallet->cs_wallet);
-            BOOST_FOREACH(const PAIRTYPE(CTxDestination, std::string)& item, wallet->mapAddressBook)
-            {
-                const CBitcoinAddress& address = item.first;
-                const std::string& strName = item.second;
-//                bool fMine = IsMine(*wallet, address.Get());
-                if (QString::fromStdString(address.ToString()).contains("Gift"))
-                    cachedGiftCardTable.append(GiftCardTableEntry(GiftCardTableEntry::Gift,
-                                  QString::fromStdString(strName),
-                                  QString::fromStdString(address.ToString())));
+        if (gcdb.allCards(cards,QString("label"))) {
+            foreach (GiftCardDataEntry entry, cards) {
+                cachedGiftCardTable.append(GiftCardTableEntry(GiftCardTableEntry::Gift,entry.label, entry.pubkey, entry.generated, entry.balance));
+//                printf("%d | %s | %s\n", entry.id, entry.pubkey.toStdString().c_str(), entry.label.toStdString().c_str());
+
             }
-        }
-        qSort(cachedGiftCardTable.begin(), cachedGiftCardTable.end(), GiftCardTableEntryLessThan());
+            qSort(cachedGiftCardTable.begin(), cachedGiftCardTable.end(), GiftCardTableEntryLessThan());
+        } else
+            OutputDebugStringF("! FAIL gcdb.allCards\n");
     }
 
-    void updateEntry(const QString &address, const QString &label, bool isMine, int status)
+    void updateEntry(const QString &address, const QString &label, const QString &generated, const float balance, int status)
     {
+        GiftCardDataEntry card;
+
         // Find address / label in model
         QList<GiftCardTableEntry>::iterator lower = qLowerBound(
             cachedGiftCardTable.begin(), cachedGiftCardTable.end(), address, GiftCardTableEntryLessThan());
@@ -99,8 +100,9 @@ public:
                 OutputDebugStringF("Warning: GiftCardTablePriv::updateEntry: Got CT_NOW, but entry is already in model\n");
                 break;
             }
+            gcdb.readCard(address, card);
             parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
-            cachedGiftCardTable.insert(lowerIndex, GiftCardTableEntry(newEntryType, label, address));
+            cachedGiftCardTable.insert(lowerIndex, GiftCardTableEntry(newEntryType, label, address, card.generated, 0.0));
             parent->endInsertRows();
             break;
         case CT_UPDATED:
@@ -109,8 +111,11 @@ public:
                 OutputDebugStringF("Warning: GiftCardTablePriv::updateEntry: Got CT_UPDATED, but entry is not in model\n");
                 break;
             }
+            gcdb.readCard(address, card);
             lower->type = newEntryType;
             lower->label = label;
+            lower->generated = card.generated;
+            lower->balance = card.balance;
             parent->emitDataChanged(lowerIndex);
             break;
         case CT_DELETED:
@@ -122,6 +127,8 @@ public:
             parent->beginRemoveRows(QModelIndex(), lowerIndex, upperIndex-1);
             cachedGiftCardTable.erase(lower, upper);
             parent->endRemoveRows();
+            parent->emitDataChanged(lowerIndex);
+
             break;
         }
     }
@@ -144,11 +151,12 @@ public:
     }
 };
 
-GiftCardTableModel::GiftCardTableModel(CWallet *wallet, WalletModel *parent) :
-    QAbstractTableModel(parent),walletModel(parent),wallet(wallet),priv(0)
+GiftCardTableModel::GiftCardTableModel(GiftCardDataManager gcdb, WalletModel *parent) :
+    QAbstractTableModel(parent),walletModel(parent),gcdb(gcdb),priv(0)
 {
-    columns << tr("Label") << tr("Address");
-    priv = new GiftCardTablePriv(wallet, this);
+    columns << tr("Label") << tr("Address") << tr("Generated") << tr("Balance");
+
+    priv = new GiftCardTablePriv(gcdb, this);
     priv->refreshAddressTable();
 }
 
@@ -156,6 +164,7 @@ GiftCardTableModel::~GiftCardTableModel()
 {
     delete priv;
 }
+
 
 int GiftCardTableModel::rowCount(const QModelIndex &parent) const
 {
@@ -191,6 +200,10 @@ QVariant GiftCardTableModel::data(const QModelIndex &index, int role) const
             }
         case Address:
             return rec->address;
+        case Generated:
+            return rec->generated;
+        case Balance:
+            return rec->balance;
         }
     }
     else if (role == Qt::FontRole)
@@ -205,6 +218,10 @@ QVariant GiftCardTableModel::data(const QModelIndex &index, int role) const
     else if (role == TypeRole)
     {
         return Gift;
+    }
+    else if (role == Qt::TextAlignmentRole) {
+        if (index.column() == Balance)
+            return Qt::AlignRight;
     }
     return QVariant();
 }
@@ -222,27 +239,12 @@ bool GiftCardTableModel::setData(const QModelIndex & index, const QVariant & val
         switch(index.column())
         {
         case Label:
-            wallet->SetAddressBookName(CBitcoinAddress(rec->address.toStdString()).Get(), value.toString().toStdString());
-            rec->label = value.toString();
+        case Generated:
+        case Balance:
+            updateEntry(rec->address, value.toString(), rec->generated, rec->balance, CT_UPDATED);
             break;
         case Address:
-            // Refuse to set invalid address, set error status and return false
-            if(!walletModel->validateAddress(value.toString()))
-            {
-                editStatus = INVALID_ADDRESS;
-                return false;
-            }
-            // Double-check that we're not overwriting a receiving address
-            if (rec->type == GiftCardTableEntry::Gift)
-            {
-                {
-                    LOCK(wallet->cs_wallet);
-                    // Remove old entry
-                    wallet->DelAddressBookName(CBitcoinAddress(rec->address.toStdString()).Get());
-                    // Add new entry with new address
-                    wallet->SetAddressBookName(CBitcoinAddress(value.toString().toStdString()).Get(), rec->label.toStdString());
-                }
-            }
+//          Can't edit addresses / left as placeholder
             break;
         }
 
@@ -253,6 +255,7 @@ bool GiftCardTableModel::setData(const QModelIndex & index, const QVariant & val
 
 QVariant GiftCardTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+
     if(orientation == Qt::Horizontal)
     {
         if(role == Qt::DisplayRole)
@@ -293,10 +296,10 @@ QModelIndex GiftCardTableModel::index(int row, int column, const QModelIndex & p
     }
 }
 
-void GiftCardTableModel::updateEntry(const QString &address, const QString &label, bool isMine, int status)
+void GiftCardTableModel::updateEntry(const QString &address, const QString &label, const QString &generated, const float balance, int status)
 {
-    // Update address book model from Bitcoin core
-    priv->updateEntry(address, label, isMine, status);
+    priv->updateEntry(address, label, generated, balance, status);
+    emitDataChanged(lookupAddress(address));
 }
 
 QString GiftCardTableModel::addRow(const QString &type, const QString &label, const QString &address)
@@ -314,18 +317,16 @@ QString GiftCardTableModel::addRow(const QString &type, const QString &label, co
 
         VanityGen(39, "Gift", strPubKey, strPrivKey);
 
-        printf("Address: %s\tPrivkey: %s\n", strPubKey, strPrivKey);
+//        printf("Address: %s\tPrivkey: %s\n", strPubKey, strPrivKey);
         strAddress = std::string(strPubKey);
+        gcdb.addCard(QString::fromStdString(std::string(strPubKey)), QString::fromStdString(std::string(strPrivKey)), label);
     }
     else
     {
         return QString();
     }
-    // Add entry
-    {
-        LOCK(wallet->cs_wallet);
-        wallet->SetAddressBookName(CBitcoinAddress(strAddress).Get(), strLabel);
-    }
+
+    updateEntry(QString::fromStdString(strAddress), label, QString(""), 0.0, CT_NEW);
 
     strAddress += ":" +  std::string(strPrivKey);
 
@@ -342,10 +343,9 @@ bool GiftCardTableModel::removeRows(int row, int count, const QModelIndex & pare
         // Also refuse to remove receiving addresses.
         return false;
     }
-    {
-        LOCK(wallet->cs_wallet);
-        wallet->DelAddressBookName(CBitcoinAddress(rec->address.toStdString()).Get());
-    }
+
+    updateEntry(rec->address, rec->label, rec->generated, rec->balance, CT_DELETED);
+
     return true;
 }
 
@@ -353,16 +353,12 @@ bool GiftCardTableModel::removeRows(int row, int count, const QModelIndex & pare
  */
 QString GiftCardTableModel::labelForAddress(const QString &address) const
 {
-    {
-        LOCK(wallet->cs_wallet);
-        CBitcoinAddress address_parsed(address.toStdString());
-        std::map<CTxDestination, std::string>::iterator mi = wallet->mapAddressBook.find(address_parsed.Get());
-        if (mi != wallet->mapAddressBook.end())
-        {
-            return QString::fromStdString(mi->second);
-        }
-    }
-    return QString();
+    QString label;
+
+    if (gcdb.readCardAttVal(address, "label", label)) {
+        return label;
+    } else
+        return QString();
 }
 
 int GiftCardTableModel::lookupAddress(const QString &address) const
@@ -382,4 +378,14 @@ int GiftCardTableModel::lookupAddress(const QString &address) const
 void GiftCardTableModel::emitDataChanged(int idx)
 {
     emit dataChanged(index(idx, 0, QModelIndex()), index(idx, columns.length()-1, QModelIndex()));
+}
+
+void GiftCardTableModel::refreshAddressTable(void)
+{
+    priv->refreshAddressTable();
+}
+
+GiftCardDataManager GiftCardTableModel::giftCardDataBase(void)
+{
+    return gcdb;
 }

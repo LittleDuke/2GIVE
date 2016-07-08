@@ -23,8 +23,8 @@ class QMenu;
 class QModelIndex;
 QT_END_NAMESPACE
 
-/** Widget that shows a list of sending or receiving addresses.
-  */
+// Widget that shows a list of Gift* addresses and balances
+
 class GiftCardPage : public QDialog
 {
     Q_OBJECT
@@ -73,8 +73,8 @@ private slots:
     void on_editButton_clicked();
     void on_fundButton_clicked();
     void on_viewButton_clicked();
+    void on_balanceButton_clicked();
     void on_regenerateButton_clicked();
-
 
     void on_deleteButton_clicked();
 

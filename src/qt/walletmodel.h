@@ -6,9 +6,11 @@
 #include <map>
 
 #include "allocators.h" /* for SecureString */
+#include "giftcarddatamanager.h"
 
 class OptionsModel;
 class AddressTableModel;
+class GiftCardDataManager;
 class GiftCardTableModel;
 class TransactionTableModel;
 class CWallet;
@@ -130,8 +132,12 @@ public:
     void unlockCoin(COutPoint& output);
     void listLockedCoins(std::vector<COutPoint>& vOutpts);
 
+    GiftCardDataManager giftCardDataBase(void);
+
 private:
     CWallet *wallet;
+    GiftCardDataManager gcdb;
+
 
     // Wallet has an options model for wallet-specific options
     // (transaction fee, for example)
