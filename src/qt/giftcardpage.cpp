@@ -409,6 +409,11 @@ void GiftCardPage::on_templateButton_clicked()
 void GiftCardPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;
+    QMessageBox msgBox;
+
+    msgBox.setWindowTitle("Delete Card");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
 
     gcdb = model->giftCardDataBase();
 
@@ -418,8 +423,15 @@ void GiftCardPage::on_deleteButton_clicked()
     if(!indexes.isEmpty())
     {
         QString pubkey = indexes.at(0).data().toString();
-        gcdb.deleteCard(pubkey, true);
-        table->model()->removeRow(indexes.at(0).row());
+
+        if (gcdb.getBalance(pubkey) == 0.0) {
+            table->model()->removeRow(indexes.at(0).row());
+            gcdb.deleteCard(pubkey, true);
+        } else {
+            msgBox.setText("Cannot delete a card with a balance.");
+            msgBox.setInformativeText("Reclaim the card by importing the private key.");
+            msgBox.exec();
+        }
     }
 }
 
