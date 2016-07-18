@@ -1444,7 +1444,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
 {
     int64 nValue = 0;
     int64 nBalance = GetBalance();
-
+printf("In CreateTransaction()\n");
     BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
     {
         if (nValue < 0)
@@ -1453,6 +1453,8 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
     }
     if (vecSend.empty() || nValue < 0)
         return false;
+
+printf("wtxNew.BindWallet(this)\n");
 
     wtxNew.BindWallet(this);
 		
@@ -1498,7 +1500,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 // vouts to the payees
                 BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
                     wtxNew.vout.push_back(CTxOut(s.second, s.first));
-
+printf("Choose coins to use\n");
                 // Choose coins to use
                 set<pair<const CWalletTx*,unsigned int> > setCoins;
                 int64 nValueIn = 0;
@@ -1520,6 +1522,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     nChange -= nMoveToFee;
                     nFeeRet += nMoveToFee;
                 }
+printf("nChange > 0\n");
 
                 if (nChange > 0)
                 {
@@ -1562,10 +1565,12 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 }
                 else
                     reservekey.ReturnKey();
-
+printf("Fill vin\n");
                 // Fill vin
                 BOOST_FOREACH(const PAIRTYPE(const CWalletTx*,unsigned int)& coin, setCoins)
                     wtxNew.vin.push_back(CTxIn(coin.first->GetHash(),coin.second));
+
+printf("Sign\n");
 
                 // Sign
                 int nIn = 0;
@@ -1588,13 +1593,13 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     continue;
                 }
 */
-
+printf("nFeeRet < nValue * 0.01\n");
                 if (nFeeRet < nValue * 0.01) {
-                    nFeeRet = nValue * 0.01;
-                    continue;
+                    nFeeRet = nValue * 0.011;
+//                    continue;
                 }
 
-
+printf("Fill vtxPrev\n");
                 // Fill vtxPrev by copying from previous transactions vtxPrev
                 wtxNew.AddSupportingTransactions(txdb);
                 wtxNew.fTimeReceivedIsTxTime = true;
