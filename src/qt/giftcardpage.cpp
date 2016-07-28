@@ -63,11 +63,8 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
         break;
     }
 
-    ui->labelExplanation->setVisible(true);
+//    ui->labelExplanation->setVisible(true);
     ui->deleteButton->setVisible(true);
-//    ui->signMessage->setVisible(false);
-
-//dvd considering adding a "Fund" option from the right click
 
     // Context menu actions
     QAction *fundCardAction = new QAction(tr("Fund Gift*"), this);
@@ -249,6 +246,8 @@ void GiftCardPage::on_fundButton_clicked()
 
 void GiftCardPage::on_newAddressButton_clicked()
 {
+    GiftCardDataEntry   card;
+
     char    strPubKey[256],
             strPrivKey[256];
 
@@ -264,14 +263,17 @@ void GiftCardPage::on_newAddressButton_clicked()
     {
 //        printf("GiftCardPage::on_newAddressButton(): dlg.exec()\n");
         newAddressToSelect = dlg.getAddress();
-        QStringList giftKeys = newAddressToSelect.split(":");
-        QString label = dlg.getLabel();
+        gcdb.readCard(newAddressToSelect, card);
 
-        strcpy(strPubKey, giftKeys.at(0).toStdString().c_str());
-        strcpy(strPrivKey, giftKeys.at(1).toStdString().c_str());
+//        QStringList giftKeys = newAddressToSelect.split(":");
+//        QString label = dlg.getLabel();
+
+//        strcpy(strPubKey, giftKeys.at(0).toStdString().c_str());
+//        strcpy(strPrivKey, giftKeys.at(1).toStdString().c_str());
 //        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
 
-        QString defaultFileName = filePath + QDir::separator() + giftKeys.at(0) + ".html";
+//        QString defaultFileName = filePath + QDir::separator() + giftKeys.at(0) + ".html";
+        QString defaultFileName = filePath + QDir::separator() + card.pubkey + ".html";
 
 //        printf("defaultFileName = %s\n", defaultFileName.toStdString().c_str());
 
@@ -279,9 +281,12 @@ void GiftCardPage::on_newAddressButton_clicked()
                     this, tr("Save Gift* Card"), defaultFileName, tr("Cards (*.html)"));
 
         if (!fileName.isNull()) {
-            PaperWallet pWallet = PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
+            card.filename = fileName;
+            PaperWallet pWallet = PaperWallet(card);
+//            PaperWallet pWallet = PaperWallet(fileName, giftKeys.at(0), giftKeys.at(1), "");
             if (pWallet.genWallet()) {
-                gcdb.updateCard(giftKeys.at(0), label, fileName);
+//                gcdb.updateCard(giftKeys.at(0), label, fileName);
+                gcdb.updateCard(card.pubkey, card.label, fileName);
                 viewGiftCard(fileName);
             }
         }
@@ -294,9 +299,15 @@ void GiftCardPage::on_regenerateButton_clicked()
 {
     QTableView *table = ui->tableView;
     GiftCardDataEntry   card;
+    QMessageBox msgBox;
+
 //    QString privKey, label, defaultFileName;
     char    strPubKey[256],
             strPrivKey[256];
+
+    msgBox.setWindowTitle("Regenerate Card");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
 
     gcdb = model->giftCardDataBase();
 
@@ -312,28 +323,34 @@ void GiftCardPage::on_regenerateButton_clicked()
 
         gcdb.readCard(pubKey, card);
 
-        strcpy(strPubKey, pubKey.toStdString().c_str());
-        strcpy(strPrivKey, card.privkey.toStdString().c_str());
-//        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
-        if (card.filename == "") {
-            QString defaultFileName = filePath + QDir::separator() + card.pubkey + ".html";
-            card.filename = defaultFileName;
-        }
-
-        QString fileName = GUIUtil::getSaveFileName(
-                    this, tr("Save Gift* Card"), card.filename, tr("Cards (*.html)"));
-
-        if (!fileName.isNull()) {
-            PaperWallet pWallet = PaperWallet(fileName, pubKey, card.privkey, "");
-            if (pWallet.genWallet()) {
-                gcdb.updateCard(card.pubkey, card.label, fileName);
-                model->updateEntry(card.pubkey, card.label, card.generated, card.balance, CT_UPDATED);
-                viewGiftCard(fileName);
+        if (card.privkey != QString::fromStdString("")) {
+            strcpy(strPubKey, pubKey.toStdString().c_str());
+            strcpy(strPrivKey, card.privkey.toStdString().c_str());
+    //        printf("strPubKey = %s\tstrPrivKey = %s\n", strPubKey, strPrivKey);
+            if (card.filename == "") {
+                QString defaultFileName = filePath + QDir::separator() + card.pubkey + ".html";
+                card.filename = defaultFileName;
             }
+
+            QString fileName = GUIUtil::getSaveFileName(
+                        this, tr("Save Gift* Card"), card.filename, tr("Cards (*.html)"));
+
+            if (!fileName.isNull()) {
+                PaperWallet pWallet = PaperWallet(card);
+//                PaperWallet pWallet = PaperWallet(fileName, pubKey, card.privkey, QString::number(card.balance), card.generated);
+                if (pWallet.genWallet()) {
+                    gcdb.updateCard(card.pubkey, card.label, fileName);
+                    model->updateEntry(card.pubkey, card.label, card.generated, card.balance, CT_UPDATED);
+                    viewGiftCard(fileName);
+                }
+            }
+        } else {
+            msgBox.setText("Cannot regenerate an imported card.");
+            msgBox.setInformativeText("Missing the private key.");
+            msgBox.exec();
         }
     }
 }
-
 void GiftCardPage::on_viewButton_clicked()
 {
     QTableView *table = ui->tableView;
@@ -410,10 +427,19 @@ void GiftCardPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;
     QMessageBox msgBox;
+    QMessageBox confirm;
 
     msgBox.setWindowTitle("Delete Card");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
+
+    confirm.setWindowTitle("Delete entry");
+    confirm.setText("Are you sure you want to delete this Gift*Card?");
+    confirm.setStandardButtons(QMessageBox::Yes);
+    confirm.addButton(QMessageBox::No);
+    confirm.setDefaultButton(QMessageBox::No);
+
+
 
     gcdb = model->giftCardDataBase();
 
@@ -424,12 +450,15 @@ void GiftCardPage::on_deleteButton_clicked()
     {
         QString pubkey = indexes.at(0).data().toString();
 
-        if (gcdb.getBalance(pubkey) == 0.0) {
-            table->model()->removeRow(indexes.at(0).row());
-            gcdb.deleteCard(pubkey, true);
+        if ((gcdb.getBalance(pubkey) == 0.0) || (QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)))
+        {
+            if (confirm.exec() == QMessageBox::Yes) {
+                table->model()->removeRow(indexes.at(0).row());
+                gcdb.deleteCard(pubkey, true);
+            }
         } else {
             msgBox.setText("Cannot delete a card with a balance.");
-            msgBox.setInformativeText("Reclaim the card by importing the private key.");
+            msgBox.setInformativeText("Hold Shift to force delete or reclaim the card by importing the private key.");
             msgBox.exec();
         }
     }

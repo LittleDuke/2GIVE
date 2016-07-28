@@ -314,6 +314,11 @@ public:
      */
     boost::signals2::signal<void (CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)> NotifyAddressBookChanged;
 
+    /** Contact entry changed.
+     * @note called with lock cs_wallet held.
+     */
+    boost::signals2::signal<void (const std::string &address, const std::string &label, const std::string &email, const std::string &url, ChangeType status)> NotifyContactChanged;
+
     /** Gift card entry changed.
      * @note called with lock cs_wallet held // Until moved to SQLite
      */

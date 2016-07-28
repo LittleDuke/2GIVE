@@ -15,6 +15,14 @@ extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
 
 const QString GiftCardTableModel::Gift = "G";
 
+// Amount column is right-aligned it contains numbers
+static int column_alignments[] = {
+        Qt::AlignLeft|Qt::AlignVCenter,
+        Qt::AlignLeft|Qt::AlignVCenter,
+        Qt::AlignLeft|Qt::AlignVCenter,
+        Qt::AlignRight|Qt::AlignVCenter
+    };
+
 struct GiftCardTableEntry
 {
     enum Type {
@@ -219,10 +227,8 @@ QVariant GiftCardTableModel::data(const QModelIndex &index, int role) const
     {
         return Gift;
     }
-    else if (role == Qt::TextAlignmentRole) {
-        if (index.column() == Balance)
-            return Qt::AlignRight;
-    }
+    else if (role == Qt::TextAlignmentRole)
+        return column_alignments[index.column()];
     return QVariant();
 }
 
@@ -262,7 +268,25 @@ QVariant GiftCardTableModel::headerData(int section, Qt::Orientation orientation
         {
             return columns[section];
         }
+        else if (role == Qt::TextAlignmentRole)
+        {
+            return column_alignments[section];
+        } else if (role == Qt::ToolTipRole)
+        {
+            switch(section)
+            {
+            case Label:
+                return tr("Name you assigned to this Gift*");
+            case Address:
+                return tr("Destination address of funds");
+            case Generated:
+                return tr("Date / Time this card was (re)generated");
+            case Balance:
+                return tr("Balance queried from live blockchain");
+            }
+        }
     }
+
     return QVariant();
 }
 
@@ -328,7 +352,7 @@ QString GiftCardTableModel::addRow(const QString &type, const QString &label, co
 
     updateEntry(QString::fromStdString(strAddress), label, QString(""), 0.0, CT_NEW);
 
-    strAddress += ":" +  std::string(strPrivKey);
+//    strAddress += ":" +  std::string(strPrivKey);
 
     return QString::fromStdString(strAddress);
 }
@@ -383,9 +407,11 @@ void GiftCardTableModel::emitDataChanged(int idx)
 void GiftCardTableModel::refreshAddressTable(void)
 {
     priv->refreshAddressTable();
+    emit dataChanged(index(0, 0, QModelIndex()), index(priv->size()-1, 0, QModelIndex()));
 }
 
 GiftCardDataManager GiftCardTableModel::giftCardDataBase(void)
 {
     return gcdb;
 }
+

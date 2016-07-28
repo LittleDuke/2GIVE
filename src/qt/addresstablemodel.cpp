@@ -8,7 +8,7 @@
 #include <QFont>
 #include <QColor>
 
-extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
+//extern int VanityGen(int addrtype, char *prefix, char *pubKey, char *privKey);
 
 const QString AddressTableModel::Send = "S";
 const QString AddressTableModel::Receive = "R";
@@ -307,9 +307,6 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
 {
     std::string strLabel = label.toStdString();
     std::string strAddress = address.toStdString();
-
-    char    strPubKey[256],
-            strPrivKey[256];
 
     editStatus = OK;
 

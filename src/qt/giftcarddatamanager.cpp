@@ -22,11 +22,16 @@ GiftCardDataManager::GiftCardDataManager()
 
 }
 
-GiftCardDataManager::GiftCardDataManager(const QString &path) :
+GiftCardDataManager::GiftCardDataManager(QSqlDatabase qdb, bool &firstRun) :
+    gdb(qdb)
+{
+    if (firstRun)
+        initSchema();
+}
+
+GiftCardDataManager::GiftCardDataManager(const QString &path, bool &firstRun) :
     gdbFilename(path)
 {
-    bool firstRun;
-
     gdb = QSqlDatabase::addDatabase("QSQLITE");
     gdb.setDatabaseName(path);
 
@@ -62,6 +67,7 @@ bool GiftCardDataManager::initSchema(void)
 
     return success;
 }
+
 
 bool GiftCardDataManager::addCard(const QString &pubkey, const QString &privkey, const QString &label, const QString &filename)
 {
@@ -321,4 +327,22 @@ bool GiftCardDataManager::updateBalances(void)
         return true;
     }
     return false;
+}
+
+bool GiftCardDataManager::migrateFromBDB4(CWallet *wallet)
+{
+    QString empty = QString::fromStdString("");
+
+    LOCK(wallet->cs_wallet);
+    BOOST_FOREACH(const PAIRTYPE(CTxDestination, std::string)& item, wallet->mapAddressBook)
+    {
+        const CBitcoinAddress& address = item.first;
+        const std::string& strName = item.second;
+        QString pubKey = QString::fromStdString(address.ToString());
+        QString label = QString::fromStdString(strName);
+
+        if (QString::fromStdString(address.ToString()).contains("Gift"))
+            addCard(pubKey, empty, label, empty);
+    }
+
 }

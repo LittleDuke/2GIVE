@@ -15,17 +15,53 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelExplanation">
-     <property name="text">
-      <string>These are your 2GiveCoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::PlainText</enum>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QToolButton" name="newAddressButton">
+       <property name="toolTip">
+        <string>Create a new address</string>
+       </property>
+       <property name="text">
+        <string>&amp;New Address</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bitcoin.qrc">
+         <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextOnly</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="giveButton">
+       <property name="text">
+        <string>Give</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="importButton">
+       <property name="text">
+        <string>Import Private Key</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="showQRCode">
+       <property name="text">
+        <string>Show &amp;QR Code</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bitcoin.qrc">
+         <normaloff>:/icons/qrcode</normaloff>:/icons/qrcode</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextOnly</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTableView" name="tableView">
@@ -58,30 +94,6 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QToolButton" name="newAddressButton">
-       <property name="toolTip">
-        <string>Create a new address</string>
-       </property>
-       <property name="text">
-        <string>&amp;New Address</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextOnly</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="giveButton">
-       <property name="text">
-        <string>Give</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="copyToClipboard">
        <property name="toolTip">
         <string>Copy the currently selected address to the system clipboard</string>
@@ -92,20 +104,6 @@
        <property name="icon">
         <iconset resource="../bitcoin.qrc">
          <normaloff>:/icons/editcopy</normaloff>:/icons/editcopy</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextOnly</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="showQRCode">
-       <property name="text">
-        <string>Show &amp;QR Code</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/qrcode</normaloff>:/icons/qrcode</iconset>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextOnly</enum>
@@ -168,19 +166,6 @@
         <enum>Qt::ToolButtonTextOnly</enum>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">

@@ -2,6 +2,7 @@
 #include "guiconstants.h"
 #include "optionsmodel.h"
 #include "addresstablemodel.h"
+#include "contacttablemodel.h"
 #include "giftcardtablemodel.h"
 #include "transactiontablemodel.h"
 
@@ -12,22 +13,59 @@
 
 #include <QSet>
 #include <QTimer>
+#include <QFile>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QMessageBox>
+
 
 WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *parent) :
-    QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0), giftCardTableModel(0),
+    QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0), contactTableModel(0), giftCardTableModel(0),
     transactionTableModel(0),
     cachedBalance(0), cachedStake(0), cachedUnconfirmedBalance(0), cachedImmatureBalance(0),
     cachedNumTransactions(0),
     cachedEncryptionStatus(Unencrypted),
     cachedNumBlocks(0)
 {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Database Manager");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
     // Connect to SQLite database
+    bool firstRun=false;
+
     boost::filesystem::path gdbName = GetDataDir() / "wallet.sqlite3";
     QString fqnDatabase = QString::fromStdString(gdbName.string());
 
-    gcdb = GiftCardDataManager(fqnDatabase);
+    qdb = QSqlDatabase::addDatabase("QSQLITE");
+    qdb.setDatabaseName(fqnDatabase);
 
+    QFile file(fqnDatabase);
+    if (file.exists()) {
+        firstRun = false;
+    } else {
+        firstRun = true;
+    }
+    if (!qdb.open()) {
+        msgBox.setText("Cannot open wallet.sqlite3");
+        msgBox.setInformativeText("Notify developers: support@strength-in-numbers.org");
+        msgBox.exec();
+    }
+
+
+//    gcdb = GiftCardDataManager(fqnDatabase, firstRun);
+    gcdb = GiftCardDataManager(qdb, firstRun);
+    ccdb = ContactDataManager(qdb, firstRun);
+
+    printf("firstRun = %s\n", firstRun ? "true" : "false");
+    if (firstRun) {
+        gcdb.migrateFromBDB4(wallet);
+        ccdb.migrateFromBDB4(wallet);
+    }
     addressTableModel = new AddressTableModel(wallet, this);
+    contactTableModel = new ContactTableModel(ccdb, this);
+
     giftCardTableModel = new GiftCardTableModel(gcdb, this);
     transactionTableModel = new TransactionTableModel(wallet, this);
 
@@ -136,6 +174,13 @@ void WalletModel::updateAddressBook(const QString &address, const QString &label
             addressTableModel->updateEntry(address, label, isMine, status);
 }
 
+void WalletModel::updateContact(const QString &address, const QString &label, const QString &email, const QString &url, int status)
+{
+ if (contactTableModel)
+     contactTableModel->updateEntry(address, label, email, url, status);
+
+}
+
 bool WalletModel::validateAddress(const QString &address)
 {
     CBitcoinAddress addressParsed(address.toStdString());
@@ -152,6 +197,8 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
     {
         return OK;
     }
+
+printf("Pre-check input data for validity\n");
 
     // Pre-check input data for validity
     foreach(const SendCoinsRecipient &rcp, recipients)
@@ -176,23 +223,26 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
 
     int64 nBalance = 0;
     std::vector<COutput> vCoins;
+printf("wallet->AvailableCoins\n");
     wallet->AvailableCoins(vCoins, true, coinControl);
 
+printf("BOOST_FOREACH()\n");
     BOOST_FOREACH(const COutput& out, vCoins)
         nBalance += out.tx->vout[out.i].nValue;
-     if(total > nBalance)
+
+    if (total > nBalance)
     {
         return AmountExceedsBalance;
     }
 
-    if((total + nTransactionFee + nCharityFee) > nBalance)
+    if ((total + nTransactionFee + nCharityFee) > nBalance)
     {
         return SendCoinsReturn(AmountWithFeeExceedsBalance, nTransactionFee, nCharityFee);
     }
 
     {
         LOCK2(cs_main, wallet->cs_wallet);
-
+printf("Sendmany\n");
         // Sendmany
         std::vector<std::pair<CScript, int64> > vecSend;
         foreach(const SendCoinsRecipient &rcp, recipients)
@@ -206,6 +256,8 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         CReserveKey keyChange(wallet);
         int64 nFeeRequired = 0;
         int64 nCharityRequired = 0;
+
+printf("wallet->CreateTransaction\n");
         bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, nCharityRequired, coinControl);
 
         if(!fCreated)
@@ -227,6 +279,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         hex = QString::fromStdString(wtx.GetHash().GetHex());
     }
 
+printf("Add addresses / update labels in address book\n");
     // Add addresses / update labels that we've sent to to the address book
     foreach(const SendCoinsRecipient &rcp, recipients)
     {
@@ -245,7 +298,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
             }
         }
     }
-
+printf("SendCoinsReturn(OK, 0, 0, hex)\n");
     return SendCoinsReturn(OK, 0, 0, hex);
 }
 
@@ -257,6 +310,11 @@ OptionsModel *WalletModel::getOptionsModel()
 AddressTableModel *WalletModel::getAddressTableModel()
 {
     return addressTableModel;
+}
+
+ContactTableModel *WalletModel::getContactTableModel()
+{
+    return contactTableModel;
 }
 
 GiftCardTableModel *WalletModel::getGiftCardTableModel()
@@ -346,6 +404,17 @@ static void NotifyAddressBookChanged(WalletModel *walletmodel, CWallet *wallet, 
                               Q_ARG(int, status));
 }
 
+static void NotifyContactChanged(WalletModel *walletmodel, QString &address, QString &label, QString &email, QString &url, ChangeType status)
+{
+//    OutputDebugStringF("NotifyContactChanged %s %s status=%i\n", CBitcoinAddress(address).ToString().c_str(), label.c_str(), status);
+    QMetaObject::invokeMethod(walletmodel, "updateContact", Qt::QueuedConnection,
+                              Q_ARG(QString, address),
+                              Q_ARG(QString, label),
+                              Q_ARG(QString, email),
+                              Q_ARG(QString, url),
+                              Q_ARG(int, status));
+}
+
 static void NotifyGiftCardChanged(WalletModel *walletmodel, CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)
 {
     OutputDebugStringF("NotifyGiftCardChanged %s %s isMine=%i status=%i\n", CBitcoinAddress(address).ToString().c_str(), label.c_str(), isMine, status);
@@ -369,6 +438,7 @@ void WalletModel::subscribeToCoreSignals()
     // Connect signals to wallet
     wallet->NotifyStatusChanged.connect(boost::bind(&NotifyKeyStoreStatusChanged, this, _1));
     wallet->NotifyAddressBookChanged.connect(boost::bind(NotifyAddressBookChanged, this, _1, _2, _3, _4, _5));
+
     wallet->NotifyGiftCardChanged.connect(boost::bind(NotifyGiftCardChanged, this, _1, _2, _3, _4, _5));
     wallet->NotifyTransactionChanged.connect(boost::bind(NotifyTransactionChanged, this, _1, _2, _3));
 }
@@ -378,6 +448,7 @@ void WalletModel::unsubscribeFromCoreSignals()
     // Disconnect signals from wallet
     wallet->NotifyStatusChanged.disconnect(boost::bind(&NotifyKeyStoreStatusChanged, this, _1));
     wallet->NotifyAddressBookChanged.disconnect(boost::bind(NotifyAddressBookChanged, this, _1, _2, _3, _4, _5));
+    wallet->NotifyContactChanged.disconnect(boost::bind(NotifyContactChanged, this, _1, _2, _3, _4, _5));
     wallet->NotifyGiftCardChanged.disconnect(boost::bind(NotifyGiftCardChanged, this, _1, _2, _3, _4, _5));
     wallet->NotifyTransactionChanged.disconnect(boost::bind(NotifyTransactionChanged, this, _1, _2, _3));
 }

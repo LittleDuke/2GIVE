@@ -58,16 +58,17 @@ private:
     QString newAddressToSelect;
 
 private slots:
+    void on_newAddressButton_clicked();
+    void on_importButton_clicked();
     void on_giveButton_clicked();
+    void on_showQRCode_clicked();
 
     void on_deleteButton_clicked();
-    void on_newAddressButton_clicked();
     /** Copy address of currently selected address entry to clipboard */
     void on_copyToClipboard_clicked();
     void on_signMessage_clicked();
     void on_verifyMessage_clicked();
     void selectionChanged();
-    void on_showQRCode_clicked();
     /** Spawn contextual menu (right mouse menu) for address book entry */
     void contextualMenu(const QPoint &point);
 

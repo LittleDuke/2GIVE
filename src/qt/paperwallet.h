@@ -4,13 +4,17 @@
 #ifndef PAPERWALLET_H
 #define PAPERWALLET_H
 
+#include "giftcarddatamanager.h"
+
 #include <QDialog>
 #include <QImage>
 
 class PaperWallet
 {
 public:
-    explicit PaperWallet(const QString &filename, const QString &addr, const QString &key, const QString &value);
+    explicit PaperWallet(const QString &filename, const QString &addr, const QString &key, const QString &value = "0.0", const QString &generated = "");
+    explicit PaperWallet(GiftCardDataEntry card);
+
     ~PaperWallet();
 
     bool setTemplate(const QString &filename);
@@ -28,6 +32,8 @@ private:
     QString privateKey;
     QString privateKeyURL;
     QString amount;
+    QString date;
+    QString label;
     QImage  publicImage;
     QImage  privateImage;
 };

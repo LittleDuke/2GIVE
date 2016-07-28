@@ -8,6 +8,7 @@
 #include "bitcoingui.h"
 #include "transactiontablemodel.h"
 #include "addressbookpage.h"
+#include "contactpage.h"
 #include "giftcardpage.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
@@ -178,7 +179,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     vbox->addWidget(transactionView);
     transactionsPage->setLayout(vbox);
 
-    addressBookPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::SendingTab);
+//    addressBookPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::SendingTab);
+    contactPage = new ContactPage(ContactPage::ForEditing, ContactPage::SendingTab);
 
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
 
@@ -194,7 +196,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralWidget->addWidget(receiveCoinsPage);
     centralWidget->addWidget(giftCoinsPage);
     centralWidget->addWidget(transactionsPage);
-    centralWidget->addWidget(addressBookPage);
+//    centralWidget->addWidget(addressBookPage);
+    centralWidget->addWidget(contactPage);
 
     setCentralWidget(centralWidget);
 
@@ -283,7 +286,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
 
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
-    connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
+//    connect(addressBookPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
+    connect(contactPage, SIGNAL(verifyMessage(QString)), this, SLOT(gotoVerifyMessageTab(QString)));
     // Clicking on "Sign Message" in the receive coins page sends you to the sign message tab
     connect(receiveCoinsPage, SIGNAL(signMessage(QString)), this, SLOT(gotoSignMessageTab(QString)));
 
@@ -344,6 +348,7 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
 
+/*
     addressBookAction = new QAction(QIcon(":/icons/Contacts"), tr("&Contacts"), this);
     addressBookAction->setToolTip(tr("Edit the list of stored addresses and labels"));
     addressBookAction->setCheckable(true);
@@ -351,8 +356,16 @@ void BitcoinGUI::createActions()
     tabGroup->addAction(addressBookAction);
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
+*/
+    contactAction = new QAction(QIcon(":/icons/Contacts"), tr("&Contacts"), this);
+    contactAction->setToolTip(tr("Edit the list of stored addresses and labels"));
+    contactAction->setCheckable(true);
+    contactAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(contactAction);
+    connect(contactAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(contactAction, SIGNAL(triggered()), this, SLOT(gotoContactPage()));
 
-    charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Donate"), this);
+    charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Support"), this);
     charitySendAction->setToolTip(tr("Donate coins for Charity purposes"));
     charitySendAction->setCheckable(true);
     charitySendAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
@@ -483,7 +496,8 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(giftCoinsAction);
     toolbar->addAction(historyAction);
-    toolbar->addAction(addressBookAction);
+//    toolbar->addAction(addressBookAction);
+    toolbar->addAction(contactAction);
     toolbar->addAction(lockWalletToggleAction);
     toolbar->addAction(charitySendAction);
     toolbar->addAction(exportAction);
@@ -526,7 +540,8 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
         connect(clientModel, SIGNAL(error(QString,QString,bool)), this, SLOT(error(QString,QString,bool)));
 
         rpcConsole->setClientModel(clientModel);
-        addressBookPage->setOptionsModel(clientModel->getOptionsModel());
+//        addressBookPage->setOptionsModel(clientModel->getOptionsModel());
+        contactPage->setOptionsModel(clientModel->getOptionsModel());
         receiveCoinsPage->setOptionsModel(clientModel->getOptionsModel());
         giftCoinsPage->setOptionsModel(clientModel->getOptionsModel());
     }
@@ -544,7 +559,8 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         transactionView->setModel(walletModel);
 
         overviewPage->setModel(walletModel);
-        addressBookPage->setModel(walletModel->getAddressTableModel());
+//        addressBookPage->setModel(walletModel->getAddressTableModel());
+        contactPage->setModel(walletModel->getContactTableModel());
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         giftCoinsPage->setModel(walletModel->getGiftCardTableModel());
         sendCoinsPage->setModel(walletModel);
@@ -800,6 +816,7 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
 
 void BitcoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
 {
+    printf("askFee()\n");
     QString strMessage =
         tr("A one percent (1%) transaction fee (TXFEE) of <br><b>%1</b> is required.  This TXFEE goes directly to the nodes "
            "that process your transaction(s) and helps to support the network.  "
@@ -878,6 +895,16 @@ void BitcoinGUI::gotoAddressBookPage()
     exportAction->setEnabled(true);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
     connect(exportAction, SIGNAL(triggered()), addressBookPage, SLOT(exportClicked()));
+}
+
+void BitcoinGUI::gotoContactPage()
+{
+    contactAction->setChecked(true);
+    centralWidget->setCurrentWidget(contactPage);
+
+    exportAction->setEnabled(true);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+    connect(exportAction, SIGNAL(triggered()), contactPage, SLOT(exportClicked()));
 }
 
 void BitcoinGUI::gotoSendCoinsPage()

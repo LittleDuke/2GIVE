@@ -2,14 +2,20 @@
 #define WALLETMODEL_H
 
 #include <QObject>
+#include <QFile>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <vector>
 #include <map>
 
 #include "allocators.h" /* for SecureString */
 #include "giftcarddatamanager.h"
+#include "contactdatamanager.h"
 
 class OptionsModel;
 class AddressTableModel;
+class ContactTableModel;
+class ContactDataManager;
 class GiftCardDataManager;
 class GiftCardTableModel;
 class TransactionTableModel;
@@ -64,6 +70,7 @@ public:
 
     OptionsModel *getOptionsModel();
     AddressTableModel *getAddressTableModel();
+    ContactTableModel *getContactTableModel();
     GiftCardTableModel *getGiftCardTableModel();
     TransactionTableModel *getTransactionTableModel();
 
@@ -133,10 +140,13 @@ public:
     void listLockedCoins(std::vector<COutPoint>& vOutpts);
 
     GiftCardDataManager giftCardDataBase(void);
+    ContactDataManager contactDataBase(void);
 
 private:
     CWallet *wallet;
+    QSqlDatabase    qdb;
     GiftCardDataManager gcdb;
+    ContactDataManager ccdb;
 
 
     // Wallet has an options model for wallet-specific options
@@ -144,6 +154,7 @@ private:
     OptionsModel *optionsModel;
 
     AddressTableModel *addressTableModel;
+    ContactTableModel *contactTableModel;
     GiftCardTableModel  *giftCardTableModel;
     TransactionTableModel *transactionTableModel;
 
@@ -171,6 +182,7 @@ public slots:
     /* New, updated or removed address book entry */
     void updateAddressBook(const QString &address, const QString &label, bool isMine, int status);
     /* Current, immature or unconfirmed balance might have changed - emit 'balanceChanged' if so */
+    void updateContact(const QString &address, const QString &label, const QString &email, const QString &url, int status);
     void pollBalanceChanged();
 
 signals:

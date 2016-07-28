@@ -5,6 +5,7 @@
 #include "optionsmodel.h"
 #include "bitcoingui.h"
 #include "editaddressdialog.h"
+#include "importkeydialog.h"
 #include "csvmodelwriter.h"
 #include "guiutil.h"
 
@@ -51,18 +52,21 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     switch(tab)
     {
     case SendingTab:
-        ui->labelExplanation->setVisible(false);
+//        ui->labelExplanation->setVisible(false);
         ui->deleteButton->setVisible(true);
         ui->signMessage->setVisible(false);
+        ui->importButton->setVisible(false);
         break;
     case ReceivingTab:
         ui->deleteButton->setVisible(false);
         ui->signMessage->setVisible(true);
+        ui->importButton->setVisible(true);
         break;
     }
 
     // Context menu actions
     QAction *giveAction = new QAction(tr("Give"), this);
+//    QAction *importAction = new QAction(ui->importButton->text(), this);
     QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *copyAddressAction = new QAction(ui->copyToClipboard->text(), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
@@ -81,13 +85,16 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
         contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
     contextMenu->addAction(showQRCodeAction);
-    if(tab == ReceivingTab)
+    if(tab == ReceivingTab) {
         contextMenu->addAction(signMessageAction);
+//        contextMenu->addAction(importAction);
+    }
     else if(tab == SendingTab)
         contextMenu->addAction(verifyMessageAction);
 
     // Connect signals for context menu actions
     connect(giveAction, SIGNAL(triggered()), this, SLOT(on_giveButton_clicked()));
+//    connect(importAction, SIGNAL(triggered()), this, SLOT(on_importButton_clicked()));
 
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(on_copyToClipboard_clicked()));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(onCopyLabelAction()));
@@ -259,6 +266,19 @@ void AddressBookPage::on_newAddressButton_clicked()
     }
 }
 
+void AddressBookPage::on_importButton_clicked()
+{
+    if(!model)
+        return;
+    ImportKeyDialog dlg;
+//    dlg.setModel(model);
+    if(dlg.exec())
+    {
+//        newAddressToSelect = dlg.getAddress();
+    }
+}
+
+
 void AddressBookPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;
@@ -285,6 +305,7 @@ void AddressBookPage::selectionChanged()
         case SendingTab:
             // In sending tab, allow deletion of selection
             ui->giveButton->setEnabled(true);
+            ui->importButton->setEnabled(false);
             ui->deleteButton->setEnabled(true);
             ui->deleteButton->setVisible(true);
             deleteAction->setEnabled(true);
@@ -296,6 +317,7 @@ void AddressBookPage::selectionChanged()
         case ReceivingTab:
             // Deleting receiving addresses, however, is not allowed
             ui->giveButton->setEnabled(true);
+            ui->importButton->setEnabled(true);
             ui->deleteButton->setEnabled(false);
             ui->deleteButton->setVisible(false);
             deleteAction->setEnabled(false);
@@ -311,6 +333,7 @@ void AddressBookPage::selectionChanged()
     else
     {
         ui->giveButton->setEnabled(false);
+        ui->importButton->setEnabled(true);
         ui->deleteButton->setEnabled(false);
         ui->showQRCode->setEnabled(false);
         ui->copyToClipboard->setEnabled(false);

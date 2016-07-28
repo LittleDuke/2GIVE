@@ -162,6 +162,8 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
+    printf("WalletModel::UnlockContext ctx(model->requestUnlock());\n");
+
     WalletModel::UnlockContext ctx(model->requestUnlock());
     if(!ctx.isValid())
     {
@@ -170,12 +172,18 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
-       WalletModel::SendCoinsReturn sendstatus;
+    printf("WalletModel::SendCoinsReturn sendstatus;\n");
+
+    WalletModel::SendCoinsReturn sendstatus;
+
+    printf("sendstatus = model->sendCoins...\n");
 
     if (!model->getOptionsModel() || !model->getOptionsModel()->getCoinControlFeatures())
         sendstatus = model->sendCoins(recipients);
     else
         sendstatus = model->sendCoins(recipients, CoinControlDialog::coinControl);
+
+    printf("switch(sendstatus.status) : %d\n", sendstatus.status);
 
     switch(sendstatus.status)
     {

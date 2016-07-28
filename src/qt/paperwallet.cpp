@@ -15,15 +15,31 @@
 
 #include <curl/curl.h>
 
-extern const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
+//extern const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
 
 
-PaperWallet::PaperWallet(const QString &filename, const QString &addr, const QString &key, const QString &value) :
+PaperWallet::PaperWallet(const QString &filename, const QString &addr, const QString &key, const QString &value, const QString &generated) :
     fileName(filename),
     address(addr),
     privateKey(key),
-    amount(value)
+    amount(value),
+    date(generated)
 {
+    addressURL = "2GIVE:" + address;
+    privateKeyURL = "2GIVE:" + privateKey;
+
+    setTemplate("default.html");
+}
+
+PaperWallet::PaperWallet(GiftCardDataEntry card)
+{
+    fileName = card.filename;
+    address = card.pubkey;
+    privateKey = card.privkey;
+    amount = QString::number(card.balance);
+    date = card.generated;
+    label = card.label;
+
     addressURL = "2GIVE:" + address;
     privateKeyURL = "2GIVE:" + privateKey;
 
@@ -167,6 +183,9 @@ bool PaperWallet::genWallet()
             htmlTemplate.replace(QString("#PUBLIC_KEY_ADDRESS#"), address);
             htmlTemplate.replace(QString("#PRIVATE_KEY_IMAGE#"), privateImageBase64);
             htmlTemplate.replace(QString("#PRIVATE_KEY_ADDRESS#"), privateKey);
+            htmlTemplate.replace(QString("#DATE_GENERATED#"), date);
+            htmlTemplate.replace(QString("#BALANCE#"), amount);
+            htmlTemplate.replace(QString("#LABEL#"), label);
         }
 
         if (!fileName.isNull()) {

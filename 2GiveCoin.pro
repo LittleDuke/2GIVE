@@ -138,15 +138,19 @@ DEPENDPATH += src src/json src/qt
 HEADERS += src/qt/bitcoingui.h \
     src/qt/transactiontablemodel.h \
     src/qt/addresstablemodel.h \
+    src/qt/contacttablemodel.h \
     src/qt/giftcardtablemodel.h \
     src/qt/optionsdialog.h \
     src/qt/sendcoinsdialog.h \
     src/qt/addressbookpage.h \
+    src/qt/contactpage.h \
     src/qt/giftcardpage.h \
     src/qt/creategiftdialog.h \
     src/qt/signverifymessagedialog.h \
     src/qt/aboutdialog.h \
     src/qt/editaddressdialog.h \
+    src/qt/editcontactdialog.h \
+    src/qt/importkeydialog.h \
     src/qt/bitcoinaddressvalidator.h \
     src/alert.h \
     src/addrman.h \
@@ -218,20 +222,25 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/coincontroltreewidget.h \
     src/qt/coincontroldialog.h \
     src/qt/stylesheeteditor.h \
-    src/qt/giftcarddatamanager.h
+    src/qt/giftcarddatamanager.h \
+    src/qt/contactdatamanager.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
     src/qt/addresstablemodel.cpp \
+    src/qt/contacttablemodel.cpp \
     src/qt/giftcardtablemodel.cpp \
     src/qt/optionsdialog.cpp \
     src/qt/sendcoinsdialog.cpp \
     src/qt/addressbookpage.cpp \
+    src/qt/contactpage.cpp \
     src/qt/giftcardpage.cpp \
     src/qt/creategiftdialog.cpp \
     src/qt/signverifymessagedialog.cpp \
     src/qt/aboutdialog.cpp \
     src/qt/editaddressdialog.cpp \
+    src/qt/editcontactdialog.cpp \
+    src/qt/importkeydialog.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
     src/alert.cpp \
     src/version.cpp \
@@ -293,7 +302,8 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/coincontroltreewidget.cpp \
     src/qt/coincontroldialog.cpp \
     src/qt/stylesheeteditor.cpp \
-    src/qt/giftcarddatamanager.cpp
+    src/qt/giftcarddatamanager.cpp \
+    src/qt/contactdatamanager.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc \
@@ -302,11 +312,14 @@ RESOURCES += \
 FORMS += \
     src/qt/forms/sendcoinsdialog.ui \
     src/qt/forms/addressbookpage.ui \
+    src/qt/forms/contactpage.ui \
     src/qt/forms/giftcardpage.ui \
     src/qt/forms/creategiftdialog.ui \
     src/qt/forms/signverifymessagedialog.ui \
     src/qt/forms/aboutdialog.ui \
     src/qt/forms/editaddressdialog.ui \
+    src/qt/forms/editcontactdialog.ui \
+    src/qt/forms/importkeydialog.ui \
     src/qt/forms/transactiondescdialog.ui \
     src/qt/forms/overviewpage.ui \
     src/qt/forms/sendcoinsentry.ui \
