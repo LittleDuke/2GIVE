@@ -30,6 +30,9 @@ public:
 
     QString getAddress() const;
     void setAddress(const QString &address);
+    void setPrivateKey(const QString &privkey);
+    void setLabel(const QString &label);
+
 private:
     bool saveCurrentRow();
 

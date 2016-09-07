@@ -11,6 +11,7 @@
 #include "allocators.h" /* for SecureString */
 #include "giftcarddatamanager.h"
 #include "contactdatamanager.h"
+#include "sharedatamanager.h"
 
 class OptionsModel;
 class AddressTableModel;
@@ -18,6 +19,8 @@ class ContactTableModel;
 class ContactDataManager;
 class GiftCardDataManager;
 class GiftCardTableModel;
+class ShareTableModel;
+class ShareDataManager;
 class TransactionTableModel;
 class CWallet;
 class CKeyID;
@@ -68,10 +71,11 @@ public:
         Unlocked      // wallet->IsCrypted() && !wallet->IsLocked()
     };
 
-    OptionsModel *getOptionsModel();
-    AddressTableModel *getAddressTableModel();
-    ContactTableModel *getContactTableModel();
-    GiftCardTableModel *getGiftCardTableModel();
+    OptionsModel        *getOptionsModel();
+    AddressTableModel   *getAddressTableModel();
+    ContactTableModel   *getContactTableModel();
+    GiftCardTableModel  *getGiftCardTableModel();
+    ShareTableModel     *getShareTableModel();
     TransactionTableModel *getTransactionTableModel();
 
     qint64 getBalance() const;
@@ -141,12 +145,14 @@ public:
 
     GiftCardDataManager giftCardDataBase(void);
     ContactDataManager contactDataBase(void);
+    ShareDataManager shareDataBase(void);
 
 private:
     CWallet *wallet;
     QSqlDatabase    qdb;
     GiftCardDataManager gcdb;
     ContactDataManager ccdb;
+    ShareDataManager scdb;
 
 
     // Wallet has an options model for wallet-specific options
@@ -156,7 +162,9 @@ private:
     AddressTableModel *addressTableModel;
     ContactTableModel *contactTableModel;
     GiftCardTableModel  *giftCardTableModel;
+    ShareTableModel   *shareTableModel;
     TransactionTableModel *transactionTableModel;
+
 
     // Cache some values to be able to detect changes
     qint64 cachedBalance;

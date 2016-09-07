@@ -75,6 +75,7 @@ private slots:
     void on_viewButton_clicked();
     void on_balanceButton_clicked();
     void on_regenerateButton_clicked();
+    void on_reclaimButton_clicked();
 
     void on_deleteButton_clicked();
 

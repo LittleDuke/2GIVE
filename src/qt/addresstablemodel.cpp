@@ -66,7 +66,7 @@ public:
                 const CBitcoinAddress& address = item.first;
                 const std::string& strName = item.second;
                 bool fMine = IsMine(*wallet, address.Get());
-                if (!QString::fromStdString(address.ToString()).contains("Gift"))
+//                if (!QString::fromStdString(address.ToString()).contains("Gift"))
                     cachedAddressTable.append(AddressTableEntry(fMine ? AddressTableEntry::Receiving : AddressTableEntry::Sending,
                                   QString::fromStdString(strName),
                                   QString::fromStdString(address.ToString())));
@@ -407,4 +407,10 @@ int AddressTableModel::lookupAddress(const QString &address) const
 void AddressTableModel::emitDataChanged(int idx)
 {
     emit dataChanged(index(idx, 0, QModelIndex()), index(idx, columns.length()-1, QModelIndex()));
+}
+
+void AddressTableModel::refreshAddressTable(void)
+{
+    priv->refreshAddressTable();
+    emit dataChanged(index(0, 0, QModelIndex()), index(priv->size()-1, 0, QModelIndex()));
 }

@@ -9,6 +9,7 @@
 #include "transactiontablemodel.h"
 #include "addressbookpage.h"
 #include "contactpage.h"
+#include "sharepage.h"
 #include "giftcardpage.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
@@ -51,6 +52,7 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QProgressDialog>
 #include <QStackedWidget>
 #include <QDateTime>
 #include <QMovie>
@@ -185,6 +187,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
 
     giftCoinsPage = new GiftCardPage(GiftCardPage::ForEditing, GiftCardPage::GiftingTab, this);
+    sharePage = new SharePage(SharePage::ForEditing, SharePage::SendingTab);
 
     sendCoinsPage = new SendCoinsDialog(this);
 
@@ -198,6 +201,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralWidget->addWidget(transactionsPage);
 //    centralWidget->addWidget(addressBookPage);
     centralWidget->addWidget(contactPage);
+    centralWidget->addWidget(sharePage);
 
     setCentralWidget(centralWidget);
 
@@ -365,13 +369,23 @@ void BitcoinGUI::createActions()
     connect(contactAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(contactAction, SIGNAL(triggered()), this, SLOT(gotoContactPage()));
 
-    charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Support"), this);
+/*
+    charitySendAction = new QAction(QIcon(":/icons/Donate"), tr("&Share"), this);
     charitySendAction->setToolTip(tr("Donate coins for Charity purposes"));
     charitySendAction->setCheckable(true);
     charitySendAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
     tabGroup->addAction(charitySendAction);
     connect(charitySendAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(charitySendAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsCharityPage()));
+*/
+
+    shareAction = new QAction(QIcon(":/icons/Donate"), tr("&Share"), this);
+    shareAction->setToolTip(tr("Donate coins for Charity purposes"));
+    shareAction->setCheckable(true);
+    shareAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+    tabGroup->addAction(shareAction);
+    connect(shareAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(shareAction, SIGNAL(triggered()), this, SLOT(gotoSharePage()));
 
     exportAction = new QAction(QIcon(":/icons/Export"), tr("&Export..."), this);
     exportAction->setToolTip(tr("Export the data in the current tab to a file"));
@@ -498,8 +512,9 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(historyAction);
 //    toolbar->addAction(addressBookAction);
     toolbar->addAction(contactAction);
+    toolbar->addAction(shareAction);
     toolbar->addAction(lockWalletToggleAction);
-    toolbar->addAction(charitySendAction);
+//    toolbar->addAction(charitySendAction);
     toolbar->addAction(exportAction);
 
 }
@@ -544,6 +559,7 @@ void BitcoinGUI::setClientModel(ClientModel *clientModel)
         contactPage->setOptionsModel(clientModel->getOptionsModel());
         receiveCoinsPage->setOptionsModel(clientModel->getOptionsModel());
         giftCoinsPage->setOptionsModel(clientModel->getOptionsModel());
+        sharePage->setOptionsModel(clientModel->getOptionsModel());
     }
 }
 
@@ -563,6 +579,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         contactPage->setModel(walletModel->getContactTableModel());
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
         giftCoinsPage->setModel(walletModel->getGiftCardTableModel());
+        sharePage->setModel(walletModel->getShareTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
 
@@ -907,6 +924,15 @@ void BitcoinGUI::gotoContactPage()
     connect(exportAction, SIGNAL(triggered()), contactPage, SLOT(exportClicked()));
 }
 
+void BitcoinGUI::gotoSharePage()
+{
+    shareAction->setChecked(true);
+    centralWidget->setCurrentWidget(sharePage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
 void BitcoinGUI::gotoSendCoinsPage()
 {
     sendCoinsAction->setChecked(true);
@@ -926,6 +952,17 @@ void BitcoinGUI::gotoReceiveCoinsPage()
     connect(exportAction, SIGNAL(triggered()), receiveCoinsPage, SLOT(exportClicked()));
 }
 
+void BitcoinGUI::gotoReceiveCoinsPageImport(QString privkey, QString label)
+{
+    receiveCoinsAction->setChecked(true);
+    centralWidget->setCurrentWidget(receiveCoinsPage);
+
+    exportAction->setEnabled(true);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+    connect(exportAction, SIGNAL(triggered()), receiveCoinsPage, SLOT(exportClicked()));
+    receiveCoinsPage->importPrivateKey(privkey, label);
+}
+
 
 void BitcoinGUI::gotoGiftCoinsPage()
 {
@@ -937,6 +974,7 @@ void BitcoinGUI::gotoGiftCoinsPage()
     connect(exportAction, SIGNAL(triggered()), giftCoinsPage, SLOT(exportClicked()));
 }
 
+/*
 void BitcoinGUI::gotoSendCoinsCharityPage()
 {
     sendCoinsAction->setChecked(true);
@@ -952,6 +990,7 @@ void BitcoinGUI::gotoSendCoinsCharityPage()
     exportAction->setEnabled(false);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
 }
+*/
 
 void BitcoinGUI::gotoSendCoinsGiftPage(QString addr, QString label)
 {

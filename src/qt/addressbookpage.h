@@ -40,6 +40,7 @@ public:
     void setModel(AddressTableModel *model);
     void setOptionsModel(OptionsModel *optionsModel);
     const QString &getReturnValue() const { return returnValue; }
+    void importPrivateKey(QString privkey, QString label);
 
 public slots:
     void done(int retval);

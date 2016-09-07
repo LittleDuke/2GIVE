@@ -74,6 +74,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     QAction *viewAction = new QAction(tr("View in browser"), this);
     QAction *balanceAction = new QAction(tr("Update Balance"), this);
     QAction *regenerateAction = new QAction(tr("Regenerate"), this);
+    QAction *reclaimAction = new QAction(tr("Reclaim"), this);
     deleteAction = new QAction(ui->deleteButton->text(), this);
 
     // Build context menu
@@ -86,6 +87,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     contextMenu->addSeparator();
     contextMenu->addAction(viewAction);
     contextMenu->addAction(balanceAction);
+    contextMenu->addAction(reclaimAction);
     contextMenu->addAction(regenerateAction);
 
     // Connect signals for context menu actions
@@ -95,6 +97,7 @@ GiftCardPage::GiftCardPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(on_copyToClipboard_clicked()));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(onCopyLabelAction()));
     connect(editAction, SIGNAL(triggered()), this, SLOT(onEditAction()));
+    connect(reclaimAction, SIGNAL(triggered()), this, SLOT(on_reclaimButton_clicked()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(on_deleteButton_clicked()));
     connect(viewAction, SIGNAL(triggered()), this, SLOT(on_viewButton_clicked()));
     connect(balanceAction, SIGNAL(triggered()), this, SLOT(on_balanceButton_clicked()));
@@ -248,8 +251,8 @@ void GiftCardPage::on_newAddressButton_clicked()
 {
     GiftCardDataEntry   card;
 
-    char    strPubKey[256],
-            strPrivKey[256];
+//    char    strPubKey[256],
+//            strPrivKey[256];
 
     gcdb = model->giftCardDataBase();
 
@@ -423,6 +426,47 @@ void GiftCardPage::on_templateButton_clicked()
     msgBox.exec();
 }
 
+void GiftCardPage::on_reclaimButton_clicked()
+{
+    QTableView *table = ui->tableView;
+    QMessageBox confirm;
+    QMessageBox msgBox;
+
+    GiftCardDataEntry   card;
+
+
+    if(!table->selectionModel())
+        return;
+
+    confirm.setWindowTitle("Reclaim Gift*Card");
+    confirm.setText("Are you sure you want to reclaim this Gift*Card?");
+    confirm.setStandardButtons(QMessageBox::Yes);
+    confirm.addButton(QMessageBox::No);
+    confirm.setDefaultButton(QMessageBox::No);
+
+    gcdb = model->giftCardDataBase();
+
+    QModelIndexList indexes = table->selectionModel()->selectedRows(1);
+    if(!indexes.isEmpty())
+    {
+        QString pubkey = indexes.at(0).data().toString();
+
+        if (gcdb.getBalance(pubkey) > 0.0) {
+            gcdb.readCard(pubkey, card);
+
+            if (confirm.exec() == QMessageBox::Yes) {
+                QMetaObject::invokeMethod(this->parent()->parent(), "gotoReceiveCoinsPageImport", GUIUtil::blockingGUIThreadConnection(),
+                                          Q_ARG(QString, card.privkey),
+                                          Q_ARG(QString, card.label));
+
+            }
+
+        } else {
+            msgBox.setText("Cannot reclaim an empty Gift*Card ");
+            msgBox.exec();
+        }
+    }
+}
 void GiftCardPage::on_deleteButton_clicked()
 {
     QTableView *table = ui->tableView;

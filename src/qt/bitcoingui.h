@@ -18,6 +18,7 @@ class TransactionView;
 class OverviewPage;
 class AddressBookPage;
 class ContactPage;
+class SharePage;
 class GiftCardPage;
 class SendCoinsDialog;
 class GiftCoinsDialog;
@@ -32,6 +33,7 @@ class QTableView;
 class QAbstractItemModel;
 class QModelIndex;
 class QProgressBar;
+class QProgressDialog;
 class QStackedWidget;
 class QUrl;
 QT_END_NAMESPACE
@@ -77,6 +79,7 @@ private:
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
     ContactPage *contactPage;
+    SharePage *sharePage;
     GiftCardPage *giftCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
@@ -88,6 +91,8 @@ private:
     QLabel *labelBlocksIcon;
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
+    QProgressDialog *progressDialog;
+
 
     QMenuBar *appMenuBar;
     QAction *giveInfoAction;
@@ -97,7 +102,8 @@ private:
     QAction *sendCoinsAction;
     QAction *addressBookAction;
     QAction *contactAction;
-    QAction *charitySendAction;
+    QAction *shareAction;
+//    QAction *charitySendAction;
     QAction *giftCoinsAction;
     QAction *signMessageAction;
     QAction *verifyMessageAction;
@@ -175,12 +181,16 @@ private slots:
     void gotoContactPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
+    /** Switch to receive coins page and pop import private key dialog */
+    void gotoReceiveCoinsPageImport(QString privkey, QString label);
+
     /** Switch to send coins page */
     void gotoSendCoinsPage();
     /** Switch to send coins page and set charity wallet as receipient*/
-    void gotoSendCoinsCharityPage();
+ //   void gotoSendCoinsCharityPage();
     /** Switch to gift coins page */
     void gotoGiftCoinsPage();
+    void gotoSharePage();
 
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
@@ -222,7 +232,6 @@ private slots:
     void updateMintingIcon();
     /** Update minting weight info */
     void updateMintingWeights();
-
 
     void editStyleSheetClick();
 };

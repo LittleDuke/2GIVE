@@ -270,12 +270,33 @@ void AddressBookPage::on_importButton_clicked()
 {
     if(!model)
         return;
+
     ImportKeyDialog dlg;
-//    dlg.setModel(model);
+
+    dlg.setModel(model);
     if(dlg.exec())
     {
-//        newAddressToSelect = dlg.getAddress();
+        newAddressToSelect = dlg.getAddress();
     }
+    model->refreshAddressTable();
+
+}
+
+void AddressBookPage::importPrivateKey(QString privkey, QString label)
+{
+    if(!model)
+        return;
+
+    ImportKeyDialog dlg;
+
+    dlg.setModel(model);
+    dlg.setPrivateKey(privkey);
+    dlg.setLabel(label);
+    if(dlg.exec())
+    {
+        newAddressToSelect = dlg.getAddress();
+    }
+    model->refreshAddressTable();
 }
 
 

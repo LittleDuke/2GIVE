@@ -3,6 +3,7 @@
 #include "optionsmodel.h"
 #include "addresstablemodel.h"
 #include "contacttablemodel.h"
+#include "sharetablemodel.h"
 #include "giftcardtablemodel.h"
 #include "transactiontablemodel.h"
 
@@ -20,7 +21,7 @@
 
 
 WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *parent) :
-    QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0), contactTableModel(0), giftCardTableModel(0),
+    QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0), contactTableModel(0), giftCardTableModel(0), shareTableModel(0),
     transactionTableModel(0),
     cachedBalance(0), cachedStake(0), cachedUnconfirmedBalance(0), cachedImmatureBalance(0),
     cachedNumTransactions(0),
@@ -57,6 +58,7 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
 //    gcdb = GiftCardDataManager(fqnDatabase, firstRun);
     gcdb = GiftCardDataManager(qdb, firstRun);
     ccdb = ContactDataManager(qdb, firstRun);
+    scdb = ShareDataManager(qdb, firstRun);
 
     printf("firstRun = %s\n", firstRun ? "true" : "false");
     if (firstRun) {
@@ -67,12 +69,18 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     contactTableModel = new ContactTableModel(ccdb, this);
 
     giftCardTableModel = new GiftCardTableModel(gcdb, this);
+
+    shareTableModel = new ShareTableModel(scdb, this);
+
     transactionTableModel = new TransactionTableModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollBalanceChanged()));
     pollTimer->start(MODEL_UPDATE_DELAY);
+
+    // Show progress dialog
+//    connect(this, SIGNAL(showProgress(QString,int)), this, SLOT(showProgress(QString,int)));
 
     subscribeToCoreSignals();
 
@@ -317,9 +325,15 @@ ContactTableModel *WalletModel::getContactTableModel()
     return contactTableModel;
 }
 
+
 GiftCardTableModel *WalletModel::getGiftCardTableModel()
 {
     return giftCardTableModel;
+}
+
+ShareTableModel *WalletModel::getShareTableModel()
+{
+    return shareTableModel;
 }
 
 TransactionTableModel *WalletModel::getTransactionTableModel()
@@ -433,12 +447,12 @@ static void NotifyTransactionChanged(WalletModel *walletmodel, CWallet *wallet, 
                               Q_ARG(int, status));
 }
 
+
 void WalletModel::subscribeToCoreSignals()
 {
     // Connect signals to wallet
     wallet->NotifyStatusChanged.connect(boost::bind(&NotifyKeyStoreStatusChanged, this, _1));
     wallet->NotifyAddressBookChanged.connect(boost::bind(NotifyAddressBookChanged, this, _1, _2, _3, _4, _5));
-
     wallet->NotifyGiftCardChanged.connect(boost::bind(NotifyGiftCardChanged, this, _1, _2, _3, _4, _5));
     wallet->NotifyTransactionChanged.connect(boost::bind(NotifyTransactionChanged, this, _1, _2, _3));
 }
@@ -557,8 +571,13 @@ void WalletModel::UnlockContext::CopyFrom(const UnlockContext& rhs)
      return;
  }
 
+
  GiftCardDataManager WalletModel::giftCardDataBase(void)
  {
      return gcdb;
  }
 
+ ShareDataManager WalletModel::shareDataBase(void)
+ {
+     return scdb;
+ }

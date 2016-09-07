@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
+    <width>605</width>
     <height>185</height>
    </rect>
   </property>
@@ -51,6 +51,12 @@
        <property name="toolTip">
         <string>The private key to import into the wallet</string>
        </property>
+       <property name="inputMask">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string notr="true"/>
+       </property>
       </widget>
      </item>
      <item row="2" column="0">
@@ -67,6 +73,15 @@
        </property>
        <property name="toolTip">
         <string>The public address paired with the private key</string>
+       </property>
+       <property name="inputMask">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string notr="true"/>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

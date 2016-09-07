@@ -323,7 +323,8 @@ QModelIndex GiftCardTableModel::index(int row, int column, const QModelIndex & p
 void GiftCardTableModel::updateEntry(const QString &address, const QString &label, const QString &generated, const float balance, int status)
 {
     priv->updateEntry(address, label, generated, balance, status);
-    emitDataChanged(lookupAddress(address));
+    if (status != CT_DELETED)
+        emitDataChanged(lookupAddress(address));
 }
 
 QString GiftCardTableModel::addRow(const QString &type, const QString &label, const QString &address)

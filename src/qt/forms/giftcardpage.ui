@@ -111,6 +111,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="reclaimButton">
+       <property name="text">
+        <string>Reclaim</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="deleteButton">
        <property name="toolTip">
         <string>Delete the currently selected address from the list</string>
