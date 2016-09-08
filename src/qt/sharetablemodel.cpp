@@ -25,10 +25,11 @@ struct ShareTableEntry
     QString address;
     QString email;
     QString url;
+    QString about;
 
     ShareTableEntry() {}
     ShareTableEntry(const int &id, const QString &label, const QString &address, const QString &email, const QString &url):
-        id(id), label(label), address(address), email(email), url(url) {}
+        id(id), label(label), address(address), email(email), url(url), about(about) {}
 };
 
 struct ShareTableEntryLessThan

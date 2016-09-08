@@ -31,6 +31,8 @@ public:
     bool allContacts(QList<ShareDataEntry> &contacts, const QString &sortBy);
     float getBalance(const QString &pubkey);
     bool updateBalances(void);
+    bool updateCampaigns(void);
+
 private:
     QString         cdbFilename;
     QSqlDatabase    cdb;

@@ -1,5 +1,6 @@
 #include "sharedatamanager.h"
 
+#include <QDir>
 #include <QFile>
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -15,6 +16,11 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 {
     ((std::string *)userp)->append((char *)contents, size*nmemb);
     return size * nmemb;
+}
+
+size_t WriteToFile(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
 }
 
 ShareDataManager::ShareDataManager()
@@ -57,7 +63,7 @@ bool ShareDataManager::initSchema(void)
     bool success = false;
     QSqlQuery query;
 
-    query.prepare("CREATE TABLE share (id integer primary key, created datetime default current_timestamp, pubkey text, label text, email text, url text, about text)");
+    query.prepare("CREATE TABLE campaigns (id integer primary key, created datetime default current_timestamp, pubkey text, label text, email text, url text, about text)");
 
     if (query.exec()) {
         success = true;
@@ -74,7 +80,7 @@ bool ShareDataManager::addContact(const QString &pubkey, const QString &label, c
     bool success = false;
     QSqlQuery query;
 
-    query.prepare("INSERT INTO share (pubkey, label, email, url) VALUES (:pubkey, :label, :email, :url)");
+    query.prepare("INSERT INTO campaigns (pubkey, label, email, url) VALUES (:pubkey, :label, :email, :url)");
     query.bindValue(":pubkey", pubkey);
     query.bindValue(":label", label);
     query.bindValue(":email", email);
@@ -97,14 +103,14 @@ bool ShareDataManager::deleteContact(const QString &pubkey)
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
-    query.prepare("SELECT id FROM share WHERE pubkey=(:pubkey)");
+    query.prepare("SELECT id FROM campaigns WHERE pubkey=(:pubkey)");
     query.bindValue(":pubkey", pubkey);
 
     if (query.exec()) {
         int idField = query.record().indexOf("id");
 //        printf("idField = %d\n", idField);
         if (query.next()) {
-            query.prepare("DELETE FROM share WHERE pubkey=(:pubkey)");
+            query.prepare("DELETE FROM campaigns WHERE pubkey=(:pubkey)");
             query.bindValue(":pubkey", pubkey);
 
             if (query.exec()) {
@@ -126,7 +132,7 @@ bool ShareDataManager::updateContact(const int id, const QString &pubkey, const 
 
     printf("id = \"%d\"\n", id);
 
-    query.prepare("SELECT id FROM share WHERE id=(:id)");
+    query.prepare("SELECT id FROM campaigns WHERE id=(:id)");
     query.bindValue(":id", id);
 
     if (query.exec()) {
@@ -135,7 +141,7 @@ bool ShareDataManager::updateContact(const int id, const QString &pubkey, const 
         if (query.next()) {
             QString idx = query.value(idField).toString();
 //            printf("idx = %s\n", idx.toStdString().c_str());
-            sql = "UPDATE share SET pubkey=(:pubkey), label=(:label), email=(:email), url=(:url)";
+            sql = "UPDATE campaigns SET pubkey=(:pubkey), label=(:label), email=(:email), url=(:url)";
             sql += " WHERE id=(:id)";
             query.prepare(sql);
             query.bindValue(":pubkey", pubkey);
@@ -163,7 +169,7 @@ bool ShareDataManager::readContact(const QString &pubkey,  ShareDataEntry &conta
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
-    query.prepare("SELECT id, label, email, url FROM share WHERE pubkey=(:pubkey)");
+    query.prepare("SELECT id, label, email, url FROM campaigns WHERE pubkey=(:pubkey)");
     query.bindValue(":pubkey", pubkey);
 
     if (query.exec()) {
@@ -202,7 +208,7 @@ bool ShareDataManager::readContactAttVal(const QString &pubkey,  const QString &
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
-    sql = "SELECT " + att + " FROM share where pubkey=(:pubkey)";
+    sql = "SELECT " + att + " FROM campaigns where pubkey=(:pubkey)";
     query.prepare(sql);
     query.bindValue(":pubkey", pubkey);
 
@@ -229,7 +235,7 @@ bool ShareDataManager::allContacts(QList<ShareDataEntry> &share, const QString &
 
 ///    printf("allshare sort by : %s\n", sortBy.toStdString().c_str());
 
-    sql = QString("SELECT id, pubkey, label, email, url FROM share ORDER BY ") + sortBy;
+    sql = QString("SELECT id, pubkey, label, email, url FROM campaigns ORDER BY ") + sortBy;
     query.prepare(sql);
 
     if (query.exec()) {
@@ -291,6 +297,46 @@ float ShareDataManager::getBalance(const QString &pubkey)
     curl_global_cleanup();
 
     return balance;
+}
+
+
+
+bool ShareDataManager::updateCampaigns(void)
+{
+    QString  fqnTemplate;
+    CURL     *curl;
+    CURLcode res;
+    FILE     *fp;
+    char *url = "http://2Give.Info/campaigns/approved.json";
+
+    boost::filesystem::path pathSrc = GetDataDir() / "campaigns";
+
+//    printf("pathSrc : %s\n", pathSrc.c_str());
+
+    if (!boost::filesystem::is_directory(pathSrc))
+        if (!boost::filesystem::create_directory(pathSrc))
+            return false;
+
+    fqnTemplate = QString::fromStdString(pathSrc.string()) + QDir::separator() + "approved.json";
+
+    curl = curl_easy_init();
+    if (curl) {
+        fp = fopen(fqnTemplate.toStdString().c_str(), "wb");
+
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteToFile);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        res = curl_easy_perform(curl);
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+        fclose(fp);
+    } else
+        return false;
+
+    if (res == CURLE_OK)
+        return true;
+    else
+        return false;
 }
 
 

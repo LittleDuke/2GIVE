@@ -109,7 +109,7 @@
         <string>Delete the currently selected address from the list</string>
        </property>
        <property name="text">
-        <string>Refresh List</string>
+        <string>Refresh Campaigns</string>
        </property>
        <property name="icon">
         <iconset resource="../bitcoin.qrc">

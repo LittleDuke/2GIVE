@@ -188,6 +188,23 @@ void SharePage::on_verifyMessage_clicked()
     emit verifyMessage(addr);
 }
 
+void SharePage::on_refreshButton_clicked()
+{
+    QMessageBox msgBox;
+
+    msgBox.setWindowTitle("Update Campaigns");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+
+    if (ccdb.updateCampaigns())
+        msgBox.setText("Campaigns Update Successful");
+    else {
+        msgBox.setText("Campaigns Update Failed");
+        msgBox.setInformativeText("Check your network connectivity and retry");
+    }
+    msgBox.exec();
+}
 
 
 void SharePage::selectionChanged()
