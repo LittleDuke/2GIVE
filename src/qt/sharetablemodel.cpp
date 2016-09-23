@@ -28,7 +28,7 @@ struct ShareTableEntry
     QString about;
 
     ShareTableEntry() {}
-    ShareTableEntry(const int &id, const QString &label, const QString &address, const QString &email, const QString &url):
+    ShareTableEntry(const int &id, const QString &label, const QString &address, const QString &email, const QString &url, const QString &about):
         id(id), label(label), address(address), email(email), url(url), about(about) {}
 };
 
@@ -64,21 +64,32 @@ public:
     {
         QList<ShareDataEntry> contacts;
 
+//        printf("PRE cachedShareTable.size() = %d\n", this->size());
+
+        parent->beginRemoveRows(QModelIndex(), 0, cachedShareTable.size());
+        cachedShareTable.erase(cachedShareTable.begin(), cachedShareTable.end());
         cachedShareTable.clear();
+        parent->endRemoveRows();
         {
+//            printf("CLR cachedShareTable.size() = %d\n", this->size());
             if (ccdb.allContacts(contacts, QString("label"))) {
                 foreach (ShareDataEntry entry, contacts) {
 //                    cachedShareTable.append(ShareTableEntry(ShareTableEntry::Sending, entry.label, entry.pubkey, entry.email, entry.url));
-                    cachedShareTable.append(ShareTableEntry(entry.id, entry.label, entry.pubkey, entry.email, entry.url));
-    //                printf("%d | %s | %s\n", entry.id, entry.pubkey.toStdString().c_str(), entry.label.toStdString().c_str());
+                    cachedShareTable.append(ShareTableEntry(entry.id, entry.label, entry.pubkey, entry.email, entry.url, entry.about));
+
+//                    printf("%d | %s | %s\n", entry.id, entry.pubkey.toStdString().c_str(), entry.label.toStdString().c_str());
 
                 }
             }
         }
+        printf("POST cachedShareTable.size() = %d\n", this->size());
+
         qSort(cachedShareTable.begin(), cachedShareTable.end(), ShareTableEntryLessThan());
+        parent->emitDataChanged(0);
+
     }
 
-    void updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, int status)
+    void updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, const QString &about, int status)
     {
         ShareDataEntry contact;
 
@@ -101,7 +112,7 @@ public:
             }
             ccdb.readContact(address, contact);
             parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
-            cachedShareTable.insert(lowerIndex, ShareTableEntry(contact.id, label, address, email, url));
+            cachedShareTable.insert(lowerIndex, ShareTableEntry(contact.id, label, address, email, url, about));
             parent->endInsertRows();
             break;
         case CT_UPDATED:
@@ -152,7 +163,7 @@ public:
 ShareTableModel::ShareTableModel(ShareDataManager ccdb, WalletModel *parent) :
     QAbstractTableModel(parent),walletModel(parent),ccdb(ccdb),priv(0)
 {
-    columns << tr("Label") << tr("Address") << tr("Email") << tr("URL");
+    columns << tr("Name") << tr("URL") << tr("Email") << tr("Address");
     priv = new ShareTablePriv(ccdb, this);
     priv->refreshShareTable();
 }
@@ -260,7 +271,7 @@ bool ShareTableModel::setData(const QModelIndex & index, const QVariant & value,
             break;
         }
 
-        updateEntry(rec->address, rec->label, rec->email, rec->url, CT_UPDATED);
+        updateEntry(rec->address, rec->label, rec->email, rec->url, rec->about, CT_UPDATED);
 
         return true;
     }
@@ -285,7 +296,7 @@ Qt::ItemFlags ShareTableModel::flags(const QModelIndex & index) const
         return 0;
     ShareTableEntry *rec = static_cast<ShareTableEntry*>(index.internalPointer());
 
-    Qt::ItemFlags retval = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    Qt::ItemFlags retval = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return retval;
 }
 
@@ -303,38 +314,13 @@ QModelIndex ShareTableModel::index(int row, int column, const QModelIndex & pare
     }
 }
 
-void ShareTableModel::updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, int status)
+void ShareTableModel::updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, const QString &about, int status)
 {
-    priv->updateEntry(address, label, email, url, status);
+    priv->updateEntry(address, label, email, url, about, status);
     if (status != CT_DELETED)
         emitDataChanged(lookupAddress(address));
 }
 
-QString ShareTableModel::addRow(const QString &label, const QString &address, const QString &email, const QString &url)
-{
-    editStatus = OK;
-
-    if (!walletModel->validateAddress(address))
-    {
-            editStatus = INVALID_ADDRESS;
-            return QString();
-    }
-        // Check for duplicate addresses
-/*        {
-            LOCK(wallet->cs_wallet);
-            if(wallet->mapAddressBook.count(CBitcoinAddress(strAddress).Get()))
-            {
-                editStatus = DUPLICATE_ADDRESS;
-                return QString();
-            }
-        }
- */
-
-    ccdb.addContact(address, label, email, url);
-    updateEntry(address, label, email, url, CT_NEW);
-
-    return address;
-}
 
 bool ShareTableModel::removeRows(int row, int count, const QModelIndex & parent)
 {
@@ -346,7 +332,7 @@ bool ShareTableModel::removeRows(int row, int count, const QModelIndex & parent)
         return false;
     }
 
-    updateEntry(rec->address, rec->label, rec->email, rec->url, CT_DELETED);
+    updateEntry(rec->address, rec->label, rec->email, rec->url, rec->about, CT_DELETED);
 
 //    ccdb.deleteContact(rec->address);
 
@@ -391,6 +377,12 @@ ShareDataManager ShareTableModel::shareDatabase(void)
 
 void ShareTableModel::refreshShareTable(void)
 {
+
     priv->refreshShareTable();
-    emit dataChanged(index(0, 0, QModelIndex()), index(priv->size()-1, 0, QModelIndex()));
+    printf("RFS cachedShareTable.size() = %d\n", priv->size());
+
+/*
+    for (int i=0; i<priv->size(); i++)
+        emit dataChanged(index(0, 0, QModelIndex()), index(i, 0, QModelIndex()));
+        */
 }

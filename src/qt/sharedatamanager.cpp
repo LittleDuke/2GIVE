@@ -38,7 +38,7 @@ ShareDataManager::ShareDataManager(QSqlDatabase qdb, bool &firstRun) :
 ShareDataManager::ShareDataManager(const QString &path, bool &firstRun) :
     cdbFilename(path)
 {
-    cdb = QSqlDatabase::addDatabase("QSQLITE");
+    cdb = QSqlDatabase::addDatabase("QSQLITE", "campaigns");
     cdb.setDatabaseName(path);
 
     QFile file(path);
@@ -61,12 +61,20 @@ ShareDataManager::ShareDataManager(const QString &path, bool &firstRun) :
 bool ShareDataManager::initSchema(void)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
     query.prepare("CREATE TABLE campaigns (id integer primary key, created datetime default current_timestamp, pubkey text, label text, email text, url text, about text)");
 
     if (query.exec()) {
-        success = true;
+        query.prepare("INSERT INTO campaigns (pubkey, label, email, url) VALUES (:pubkey, :label, :email, :url)");
+        query.bindValue(":pubkey", "Give2SNF82LXRvkoa4NYtSuMMUyQvTAsMs");
+        query.bindValue(":label", "Strength in Numbers Foundation");
+        query.bindValue(":email", "info@strength-in-numbers.org");
+        query.bindValue(":url", "http://strength-in-numbers.org");
+
+        if (query.exec())
+            success = true;
+
     } else {
         printf("! Unable to initialize database schema\n");
     }
@@ -75,97 +83,13 @@ bool ShareDataManager::initSchema(void)
 }
 
 
-bool ShareDataManager::addContact(const QString &pubkey, const QString &label, const QString &email, const QString &url)
-{
-    bool success = false;
-    QSqlQuery query;
 
-    query.prepare("INSERT INTO campaigns (pubkey, label, email, url) VALUES (:pubkey, :label, :email, :url)");
-    query.bindValue(":pubkey", pubkey);
-    query.bindValue(":label", label);
-    query.bindValue(":email", email);
-    query.bindValue(":url", url);
-
-    if (query.exec()) {
-        success = true;
-    } else {
-        printf("! Unable to insert contact into database\n");
-    }
-
-    return success;
-
-}
-
-bool ShareDataManager::deleteContact(const QString &pubkey)
-{
-    bool success = false;
-    QSqlQuery query;
-
-//    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
-
-    query.prepare("SELECT id FROM campaigns WHERE pubkey=(:pubkey)");
-    query.bindValue(":pubkey", pubkey);
-
-    if (query.exec()) {
-        int idField = query.record().indexOf("id");
-//        printf("idField = %d\n", idField);
-        if (query.next()) {
-            query.prepare("DELETE FROM campaigns WHERE pubkey=(:pubkey)");
-            query.bindValue(":pubkey", pubkey);
-
-            if (query.exec()) {
-                success = true;
-            } else {
-                printf("! Unable to delete contact from database\n");
-            }
-        }
-    }
-
-    return success;
-}
-
-bool ShareDataManager::updateContact(const int id, const QString &pubkey, const QString &label, const QString &email, const QString &url)
-{
-    bool success = false;
-    QString     sql;
-    QSqlQuery   query;
-
-    printf("id = \"%d\"\n", id);
-
-    query.prepare("SELECT id FROM campaigns WHERE id=(:id)");
-    query.bindValue(":id", id);
-
-    if (query.exec()) {
-        int idField = query.record().indexOf("id");
-//        printf("idField = %d\n", idField);
-        if (query.next()) {
-            QString idx = query.value(idField).toString();
-//            printf("idx = %s\n", idx.toStdString().c_str());
-            sql = "UPDATE campaigns SET pubkey=(:pubkey), label=(:label), email=(:email), url=(:url)";
-            sql += " WHERE id=(:id)";
-            query.prepare(sql);
-            query.bindValue(":pubkey", pubkey);
-            query.bindValue(":label", label);
-            query.bindValue(":email", email);
-            query.bindValue(":url", url);
-            query.bindValue(":id", idx);
-
-            if (query.exec()) {
-                success = true;
-            } else {
-                printf("! Unable to update contact in database\n");
-            }
-        }
-    }
-
-    return success;
-}
 
 
 bool ShareDataManager::readContact(const QString &pubkey,  ShareDataEntry &contact)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -203,7 +127,7 @@ bool ShareDataManager::readContact(const QString &pubkey,  ShareDataEntry &conta
 bool ShareDataManager::readContactAttVal(const QString &pubkey,  const QString &att, QString &val) const
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
     QString sql;
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
@@ -229,7 +153,7 @@ bool ShareDataManager::allContacts(QList<ShareDataEntry> &share, const QString &
 {
     bool success = false;
     QString   sql;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -300,16 +224,16 @@ float ShareDataManager::getBalance(const QString &pubkey)
 }
 
 
-
 bool ShareDataManager::updateCampaigns(void)
 {
     QString  fqnTemplate;
     CURL     *curl;
     CURLcode res;
     FILE     *fp;
-    char *url = "http://2Give.Info/campaigns/approved.json";
 
-    boost::filesystem::path pathSrc = GetDataDir() / "campaigns";
+    char *url = "http://2Give.Info/campaigns/campaigns.sqlite3";
+
+    boost::filesystem::path pathSrc = GetDataDir();
 
 //    printf("pathSrc : %s\n", pathSrc.c_str());
 
@@ -317,13 +241,16 @@ bool ShareDataManager::updateCampaigns(void)
         if (!boost::filesystem::create_directory(pathSrc))
             return false;
 
-    fqnTemplate = QString::fromStdString(pathSrc.string()) + QDir::separator() + "approved.json";
+    fqnTemplate = QString::fromStdString(pathSrc.string()) + QDir::separator() + "campaigns.sqlite3";
 
     curl = curl_easy_init();
     if (curl) {
         fp = fopen(fqnTemplate.toStdString().c_str(), "wb");
 
         curl_easy_setopt(curl, CURLOPT_URL, url);
+//        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+//        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteToFile);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
         res = curl_easy_perform(curl);
@@ -333,8 +260,9 @@ bool ShareDataManager::updateCampaigns(void)
     } else
         return false;
 
-    if (res == CURLE_OK)
+    if (res == CURLE_OK) {
         return true;
+    }
     else
         return false;
 }

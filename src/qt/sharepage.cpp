@@ -11,6 +11,9 @@
 #include <QClipboard>
 #include <QMessageBox>
 #include <QMenu>
+#include <QDesktopServices>     // dvd add for launching URL
+#include <QUrl>                 // dvd add for launching URL
+
 
 #ifdef USE_QRCODE
 #include "qrcodedialog.h"
@@ -53,6 +56,7 @@ SharePage::SharePage(Mode mode, Tabs tab, QWidget *parent) :
 
     // Context menu actions
     QAction *giveAction = new QAction(tr("Give"), this);
+    QAction *visitAction = new QAction(tr("Visit Website"), this);
     QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *copyAddressAction = new QAction(ui->copyToClipboard->text(), this);
     QAction *showQRCodeAction = new QAction(ui->showQRCode->text(), this);
@@ -61,6 +65,7 @@ SharePage::SharePage(Mode mode, Tabs tab, QWidget *parent) :
     // Build context menu
     contextMenu = new QMenu();
     contextMenu->addAction(giveAction);
+    contextMenu->addAction(visitAction);
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addSeparator();
@@ -70,6 +75,7 @@ SharePage::SharePage(Mode mode, Tabs tab, QWidget *parent) :
 
     // Connect signals for context menu actions
     connect(giveAction, SIGNAL(triggered()), this, SLOT(on_giveButton_clicked()));
+    connect(visitAction, SIGNAL(triggered()), this, SLOT(on_visitButton_clicked()));
 
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(on_copyToClipboard_clicked()));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(onCopyLabelAction()));
@@ -114,9 +120,9 @@ void SharePage::setModel(ShareTableModel *model)
     // Set column widths
 #if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->resizeSection(ShareTableModel::Address, 333);
-    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::Label, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::Email, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::URL, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::Label, QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::Email, QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setResizeMode(ShareTableModel::URL, QHeaderView::ResizeToContents);
 #else
     ui->tableView->horizontalHeader()->setSectionResizeMode(ShareTableModel::Label, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(ShareTableModel::Address, QHeaderView::ResizeToContents);
@@ -147,7 +153,7 @@ void SharePage::on_giveButton_clicked()
     if (!table->selectionModel())
         return;
 
-    QModelIndexList indexes = table->selectionModel()->selectedRows(1);
+    QModelIndexList indexes = table->selectionModel()->selectedRows(ShareTableModel::Address);
     if(!indexes.isEmpty())
     {
         index = indexes.at(0);
@@ -196,7 +202,6 @@ void SharePage::on_refreshButton_clicked()
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
 
-
     if (ccdb.updateCampaigns())
         msgBox.setText("Campaigns Update Successful");
     else {
@@ -204,6 +209,13 @@ void SharePage::on_refreshButton_clicked()
         msgBox.setInformativeText("Check your network connectivity and retry");
     }
     msgBox.exec();
+
+    setModel(model);
+//    ui->tableView->reset();
+    model->refreshShareTable();
+//    ui->tableView->update();
+//    ui->tableView->repaint();
+    ui->tableView->setModel(model);
 }
 
 
@@ -311,6 +323,22 @@ void SharePage::on_showQRCode_clicked()
         dialog->show();
     }
 #endif
+}
+
+void SharePage::on_visitButton_clicked()
+{
+    QTableView *table = ui->tableView;
+    QModelIndexList indexes = table->selectionModel()->selectedRows(ShareTableModel::URL);
+
+    if (!table->selectionModel())
+        return;
+
+    if(!indexes.isEmpty())
+    {
+        QString url = indexes.at(0).data().toString();
+
+        QDesktopServices::openUrl(QUrl(url));
+    }
 }
 
 void SharePage::contextualMenu(const QPoint &point)

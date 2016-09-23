@@ -32,7 +32,7 @@ ContactDataManager::ContactDataManager(QSqlDatabase qdb, bool &firstRun) :
 ContactDataManager::ContactDataManager(const QString &path, bool &firstRun) :
     cdbFilename(path)
 {
-    cdb = QSqlDatabase::addDatabase("QSQLITE");
+    cdb = QSqlDatabase::addDatabase("QSQLITE", "wallet");
     cdb.setDatabaseName(path);
 
     QFile file(path);
@@ -55,7 +55,7 @@ ContactDataManager::ContactDataManager(const QString &path, bool &firstRun) :
 bool ContactDataManager::initSchema(void)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
     query.prepare("CREATE TABLE contacts (id integer primary key, created datetime default current_timestamp, pubkey text, label text, email text, url text)");
 
@@ -72,7 +72,7 @@ bool ContactDataManager::initSchema(void)
 bool ContactDataManager::addContact(const QString &pubkey, const QString &label, const QString &email, const QString &url)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
     query.prepare("INSERT INTO contacts (pubkey, label, email, url) VALUES (:pubkey, :label, :email, :url)");
     query.bindValue(":pubkey", pubkey);
@@ -93,7 +93,7 @@ bool ContactDataManager::addContact(const QString &pubkey, const QString &label,
 bool ContactDataManager::deleteContact(const QString &pubkey)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -122,7 +122,7 @@ bool ContactDataManager::updateContact(const int id, const QString &pubkey, cons
 {
     bool success = false;
     QString     sql;
-    QSqlQuery   query;
+    QSqlQuery   query(cdb);
 
     printf("id = \"%d\"\n", id);
 
@@ -159,7 +159,7 @@ bool ContactDataManager::updateContact(const int id, const QString &pubkey, cons
 bool ContactDataManager::readContact(const QString &pubkey,  ContactDataEntry &contact)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -197,7 +197,7 @@ bool ContactDataManager::readContact(const QString &pubkey,  ContactDataEntry &c
 bool ContactDataManager::readContactAttVal(const QString &pubkey,  const QString &att, QString &val) const
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
     QString sql;
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
@@ -223,7 +223,7 @@ bool ContactDataManager::allContacts(QList<ContactDataEntry> &contacts, const QS
 {
     bool success = false;
     QString   sql;
-    QSqlQuery query;
+    QSqlQuery query(cdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 

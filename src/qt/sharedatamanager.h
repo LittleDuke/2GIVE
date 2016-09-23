@@ -22,12 +22,8 @@ public:
     explicit ShareDataManager();
     explicit ShareDataManager(const QString &path, bool &firstRun);
     explicit ShareDataManager(QSqlDatabase cdb, bool &firstRun);
-    bool addContact(const QString &pubkey, const QString &label, const QString &email = "", const QString &url = "");
-//    bool readContact(const QString &pubkey, QString &privkey, QString &label, QString &filename) const;
     bool readContact(const QString &pubkey, ShareDataEntry &contact);
     bool readContactAttVal(const QString &pubkey,  const QString &att, QString &val) const;
-    bool deleteContact(const QString &pubkey);
-    bool updateContact(const int id, const QString &pubkey, const QString &label, const QString &email = "", const QString &url = "");
     bool allContacts(QList<ShareDataEntry> &contacts, const QString &sortBy);
     float getBalance(const QString &pubkey);
     bool updateBalances(void);

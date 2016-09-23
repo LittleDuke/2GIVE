@@ -39,7 +39,7 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     boost::filesystem::path gdbName = GetDataDir() / "wallet.sqlite3";
     QString fqnDatabase = QString::fromStdString(gdbName.string());
 
-    qdb = QSqlDatabase::addDatabase("QSQLITE");
+    qdb = QSqlDatabase::addDatabase("QSQLITE", "wallet");
     qdb.setDatabaseName(fqnDatabase);
 
     QFile file(fqnDatabase);
@@ -55,20 +55,43 @@ WalletModel::WalletModel(CWallet *wallet, OptionsModel *optionsModel, QObject *p
     }
 
 
-//    gcdb = GiftCardDataManager(fqnDatabase, firstRun);
     gcdb = GiftCardDataManager(qdb, firstRun);
     ccdb = ContactDataManager(qdb, firstRun);
-    scdb = ShareDataManager(qdb, firstRun);
+
 
     printf("firstRun = %s\n", firstRun ? "true" : "false");
     if (firstRun) {
         gcdb.migrateFromBDB4(wallet);
         ccdb.migrateFromBDB4(wallet);
     }
+
     addressTableModel = new AddressTableModel(wallet, this);
     contactTableModel = new ContactTableModel(ccdb, this);
 
     giftCardTableModel = new GiftCardTableModel(gcdb, this);
+
+// connect to the campaigns database
+    firstRun=false;
+
+    boost::filesystem::path cdbName = GetDataDir() / "campaigns.sqlite3";
+    QString cfqnDatabase = QString::fromStdString(cdbName.string());
+
+    cdb = QSqlDatabase::addDatabase("QSQLITE", "campaigns");
+    cdb.setDatabaseName(cfqnDatabase);
+
+    QFile cfile(cfqnDatabase);
+    if (cfile.exists()) {
+        firstRun = false;
+    } else {
+        firstRun = true;
+    }
+    if (!cdb.open()) {
+        msgBox.setText("Cannot open campaigns.sqlite3");
+        msgBox.setInformativeText("Refresh Campaigns under Share tab");
+        msgBox.exec();
+    }
+
+    scdb = ShareDataManager(cdb, firstRun);
 
     shareTableModel = new ShareTableModel(scdb, this);
 

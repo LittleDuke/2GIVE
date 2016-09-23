@@ -32,7 +32,8 @@ GiftCardDataManager::GiftCardDataManager(QSqlDatabase qdb, bool &firstRun) :
 GiftCardDataManager::GiftCardDataManager(const QString &path, bool &firstRun) :
     gdbFilename(path)
 {
-    gdb = QSqlDatabase::addDatabase("QSQLITE");
+    gdb = QSqlDatabase::addDatabase("QSQLITE", "wallet");
+//    gdb = QSqlDatabase::database("wallet");
     gdb.setDatabaseName(path);
 
     QFile file(path);
@@ -55,7 +56,7 @@ GiftCardDataManager::GiftCardDataManager(const QString &path, bool &firstRun) :
 bool GiftCardDataManager::initSchema(void)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
 
     query.prepare("CREATE TABLE giftcards (id integer primary key, generated datetime default current_timestamp, pubkey text, privkey text, filename text, label text, text template, balance float)");
 
@@ -72,7 +73,7 @@ bool GiftCardDataManager::initSchema(void)
 bool GiftCardDataManager::addCard(const QString &pubkey, const QString &privkey, const QString &label, const QString &filename)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
 
     query.prepare("INSERT INTO giftcards (pubkey, privkey, filename, label) VALUES (:pubkey, :privkey, :filename, :label)");
     query.bindValue(":pubkey", pubkey);
@@ -93,7 +94,7 @@ bool GiftCardDataManager::addCard(const QString &pubkey, const QString &privkey,
 bool GiftCardDataManager::deleteCard(const QString &pubkey, bool deleteFile)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -132,7 +133,7 @@ bool GiftCardDataManager::updateCard(const QString &pubkey, const QString &label
     bool success = false;
     float       balance=0.0;
     QString     sql;
-    QSqlQuery   query;
+    QSqlQuery   query(gdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -173,7 +174,7 @@ bool GiftCardDataManager::updateCard(const QString &pubkey, const QString &label
 bool GiftCardDataManager::readCard(const QString &pubkey,  GiftCardDataEntry &card)
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 
@@ -217,7 +218,7 @@ bool GiftCardDataManager::readCard(const QString &pubkey,  GiftCardDataEntry &ca
 bool GiftCardDataManager::readCardAttVal(const QString &pubkey,  const QString &att, QString &val) const
 {
     bool success = false;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
     QString sql;
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
@@ -243,7 +244,7 @@ bool GiftCardDataManager::allCards(QList<GiftCardDataEntry> &cards, const QStrin
 {
     bool success = false;
     QString   sql;
-    QSqlQuery query;
+    QSqlQuery query(gdb);
 
 //    printf("pubkey = \"%s\"\n", pubkey.toStdString().c_str());
 

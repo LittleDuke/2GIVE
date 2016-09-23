@@ -24,6 +24,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="visitButton">
+       <property name="text">
+        <string>Visit Website</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="showQRCode">
        <property name="text">
         <string>Show &amp;QR Code</string>

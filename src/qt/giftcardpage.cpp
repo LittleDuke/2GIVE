@@ -354,6 +354,7 @@ void GiftCardPage::on_regenerateButton_clicked()
         }
     }
 }
+
 void GiftCardPage::on_viewButton_clicked()
 {
     QTableView *table = ui->tableView;

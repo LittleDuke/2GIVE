@@ -22,9 +22,10 @@ public:
 
     enum ColumnIndex {
         Label = 0,
-        Address = 1,
+        URL = 1,
         Email = 2,
-        URL = 3
+        Address = 3,
+        About = 4
     };
 
     enum RoleIndex {
@@ -52,10 +53,6 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const;
     /*@}*/
 
-    /* Add an address to the model.
-       Returns the added address on success, and an empty string otherwise.
-     */
-    QString addRow(const QString &label, const QString &address, const QString &email, const QString &url);
 
     /* Look up label for address in address book, if not found return empty string.
      */
@@ -86,7 +83,7 @@ signals:
 public slots:
     /* Update address list from core.
      */
-    void updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, int status);
+    void updateEntry(const QString &address, const QString &label, const QString &email, const QString &url, const QString &about, int status);
     void refreshShareTable(void);
 
     friend class ShareTablePriv;

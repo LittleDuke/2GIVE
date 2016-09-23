@@ -150,6 +150,7 @@ public:
 private:
     CWallet *wallet;
     QSqlDatabase    qdb;
+    QSqlDatabase    cdb;
     GiftCardDataManager gcdb;
     ContactDataManager ccdb;
     ShareDataManager scdb;

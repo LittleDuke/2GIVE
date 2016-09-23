@@ -68,6 +68,8 @@ private slots:
     void on_copyToClipboard_clicked();
     void on_verifyMessage_clicked();
     void on_refreshButton_clicked();
+    void on_visitButton_clicked();
+
 
     void selectionChanged();
     void on_showQRCode_clicked();
