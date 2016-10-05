@@ -83,6 +83,12 @@ SharePage::SharePage(Mode mode, Tabs tab, QWidget *parent) :
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(on_verifyMessage_clicked()));
 
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
+
+    ui->refreshButton->setEnabled(false);
+    ui->refreshButton->setVisible(false);
+
+    ccdb.updateCampaigns();
+
 }
 
 SharePage::~SharePage()

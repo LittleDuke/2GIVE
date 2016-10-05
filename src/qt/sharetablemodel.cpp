@@ -36,15 +36,15 @@ struct ShareTableEntryLessThan
 {
     bool operator()(const ShareTableEntry &a, const ShareTableEntry &b) const
     {
-        return a.address < b.address;
+        return a.label < b.label;
     }
     bool operator()(const ShareTableEntry &a, const QString &b) const
     {
-        return a.address < b;
+        return a.label < b;
     }
     bool operator()(const QString &a, const ShareTableEntry &b) const
     {
-        return a < b.address;
+        return a < b.label;
     }
 };
 
