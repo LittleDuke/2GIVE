@@ -64,7 +64,7 @@ QT += sql
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
 contains(USE_QRCODE, -) {
-    message(Building with without QRCode support)
+    message(Building without QRCode support)
 } else {
     message(Building with QRCode support)
     count(USE_QRCODE, 0) {
