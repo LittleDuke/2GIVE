@@ -288,7 +288,9 @@ float GiftCardDataManager::getBalance(const QString &pubkey)
     float       balance=0.0;
     std::string readBuffer;
 
-    url = QString("http://xtc.inter.com:2751/chain/2GiveCoin/q/addressbalance/") + pubkey;
+    url = QString("http://seed.givecoin.io/chain/2GiveCoin/q/addressbalance/") + pubkey;
+// dvd consider switching to this
+    //    url = QString("http://www.blockexperts.com/api?coin=2give&action=getbalance&address=") + pubkey;
 
     curl_global_init(CURL_GLOBAL_ALL);
 

@@ -88,7 +88,6 @@ SharePage::SharePage(Mode mode, Tabs tab, QWidget *parent) :
     ui->refreshButton->setVisible(false);
 
     ccdb.updateCampaigns();
-
 }
 
 SharePage::~SharePage()

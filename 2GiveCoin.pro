@@ -21,7 +21,6 @@ BDB_LIB_PATH=/usr/local/opt/berkeley-db4/lib
 OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
 OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
 
-CONFIG += static
 
 # UNCOMMENT THIS SECTION TO BUILD ON WINDOWS
 # Change paths if needed, these use the foocoin/deps.git repository locations
@@ -60,6 +59,8 @@ win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 
 # Gift*card support
 QT += sql
+LIBS += -lsqlite3
+file += sql
 
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
