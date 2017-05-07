@@ -1,0 +1,17 @@
+install_name_tool -change /usr/local/opt/qrencode/lib/libqrencode.3.dylib @executable_path/../Frameworks/libqrencode.3.dylib  2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/miniupnpc/lib/libminiupnpc.16.dylib @executable_path/../Frameworks/libminiupnpc.16.dylib  2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/openssl/lib/libssl.1.0.0.dylib @executable_path/../Frameworks/libssl.1.0.0.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib @executable_path/../Frameworks/libcrypto.1.0.0.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/lib/libpcre.0.dylib @executable_path/../Frameworks/libpcre.0.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/lib/libcurl.4.dylib @executable_path/../Frameworks/libcurl.4.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/berkeley-db4/lib/libdb_cxx-4.8.dylib @executable_path/../Frameworks/libdb_cxx-4.8.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/boost/lib/libboost_system-mt.dylib @executable_path/../Frameworks/libboost_system-mt.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/boost/lib/libboost_filesystem-mt.dylib @executable_path/../Frameworks/libboost_filesystem-mt.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/boost/lib/libboost_program_options-mt.dylib @executable_path/../Frameworks/libboost_program_options-mt.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/boost/lib/libboost_thread-mt.dylib @executable_path/../Frameworks/libboost_thread-mt.dylib 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtSql.framework/Versions/5/QtSql @executable_path/../Frameworks/QtSql.framework/Versions/5/QtSql 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtNetwork.framework/Versions/5/QtNetwork @executable_path/../Frameworks/QtNetwork.framework/Versions/5/QtNetwork 2GiveCoin-Qt
+
