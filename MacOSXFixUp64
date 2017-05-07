@@ -9,9 +9,9 @@ install_name_tool -change /usr/local/opt/boost/lib/libboost_system-mt.dylib @exe
 install_name_tool -change /usr/local/opt/boost/lib/libboost_filesystem-mt.dylib @executable_path/../Frameworks/libboost_filesystem-mt.dylib 2GiveCoin-Qt
 install_name_tool -change /usr/local/opt/boost/lib/libboost_program_options-mt.dylib @executable_path/../Frameworks/libboost_program_options-mt.dylib 2GiveCoin-Qt
 install_name_tool -change /usr/local/opt/boost/lib/libboost_thread-mt.dylib @executable_path/../Frameworks/libboost_thread-mt.dylib 2GiveCoin-Qt
-install_name_tool -change /usr/local/opt/qt5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets 2GiveCoin-Qt
-install_name_tool -change /usr/local/opt/qt5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui 2GiveCoin-Qt
-install_name_tool -change /usr/local/opt/qt5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore 2GiveCoin-Qt
-install_name_tool -change /usr/local/opt/qt5/lib/QtSql.framework/Versions/5/QtSql @executable_path/../Frameworks/QtSql.framework/Versions/5/QtSql 2GiveCoin-Qt
-install_name_tool -change /usr/local/opt/qt5/lib/QtNetwork.framework/Versions/5/QtNetwork @executable_path/../Frameworks/QtNetwork.framework/Versions/5/QtNetwork 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtSql.framework/Versions/5/QtSql @executable_path/../Frameworks/QtSql 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt5/lib/QtNetwork.framework/Versions/5/QtNetwork @executable_path/../Frameworks/QtNetwork 2GiveCoin-Qt
 
