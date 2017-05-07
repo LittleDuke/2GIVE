@@ -4,9 +4,10 @@ install_name_tool -change /usr/local/lib/libboost_system-mt.dylib @executable_pa
 install_name_tool -change /usr/local/lib/libboost_filesystem-mt.dylib @executable_path/../Frameworks/libboost_filesystem-mt.dylib 2GiveCoin-Qt
 install_name_tool -change /usr/local/lib/libboost_program_options-mt.dylib @executable_path/../Frameworks/libboost_program_options-mt.dylib 2GiveCoin-Qt
 install_name_tool -change /usr/local/lib/libboost_thread-mt.dylib @executable_path/../Frameworks/libboost_thread-mt.dylib 2GiveCoin-Qt
-install_name_tool -change /usr/local/lib/QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui 2GiveCoin-Qt
-install_name_tool -change /usr/local/lib/QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore 2GiveCoin-Qt
-install_name_tool -change /usr/local/lib/QtNetwork.framework/Versions/4/QtNetwork @executable_path/../Frameworks/QtNetwork 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt/lib/QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/4/QtGui 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt/lib/QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/4/QtCore 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt/lib/QtNetwork.framework/Versions/4/QtNetwork @executable_path/../Frameworks/QtNetwork.framework/Versions/4/QtNetwork 2GiveCoin-Qt
+install_name_tool -change /usr/local/opt/qt/lib/QtSql.framework/Versions/4/QtSql @executable_path/../Frameworks/QtSql.framework/Versions/4/QtSql 2GiveCoin-Qt
 
 install_name_tool -change /usr/local/opt/openssl/lib/libssl.1.0.0.dylib @executable_path/../Frameworks/libssl.1.0.0.dylib 2GiveCoin-Qt
 install_name_tool -change /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib @executable_path/../Frameworks/libcrypto.1.0.0.dylib 2GiveCoin-Qt
